@@ -33,7 +33,7 @@ Base path: `/Users/matthewhanratty/Documents/New project/`
 
 **GM sidebar bands (7):** High Steal · Mid Steal · Low Steal · Expected · Low Reach · Mid Reach · High Reach.
 
-**Coach:** on Start/Sit — `POST /api/coach/insight`, `POST /api/coach/question`; structured outputs only.
+**Coach** (advisory only — no lineup/transaction automation): Insights button, Q&A (`POST /api/coach/insight`, `POST /api/coach/question`), scenario templates (Highest Ceiling, Best Boom, Safest Bet, Best Floor, Need Upside, Protect Lead), usage-trend watch/drop, waiver language gated on league availability ([page-content-spec](./page-content-spec.md) § Coach).
 
 **Non-negotiable:** no provider calls from React; dynamic roster slots; manual draft board + manual roster upload are first-class fallbacks.
 

@@ -323,6 +323,8 @@ V1 behavior:
 - User can click `Insight` to generate a lineup/bench recommendation.
 - User can ask direct questions like `Allen vs Mahomes`.
 - Coach answers from structured model outputs, not model memory.
+- Coach is advisory only. It does not automate, submit, or manage lineups/transactions.
+- User implements decisions on the actual fantasy platform.
 
 Data routes:
 
@@ -347,12 +349,47 @@ type CoachContext = {
 
 Coach must support:
 
-- Start/sit swaps.
+- Start/sit comparisons.
 - Floor/ceiling tradeoffs.
 - Boom scenario recommendations.
 - Safer floor recommendations.
-- Waiver suggestions where available.
+- Trend-based bench/watch/drop considerations.
+- Waiver suggestions only where availability or roster percentage data supports the language.
 - "No move needed" when the lineup is already set appropriately.
+
+Coach question examples:
+
+- "How's my lineup this week?"
+- "Should I play Mahomes over Allen?"
+- "Which WR has the best boom chance?"
+- "Who has the highest ceiling at RB on my team this week?"
+- "Who is trending down on my bench?"
+
+Coach scenario templates:
+
+- Highest Ceiling.
+- Best Boom Chance.
+- Safest Bet.
+- Best Floor.
+- Need Upside.
+- Protect Lead.
+
+Coach waiver language rules:
+
+- If league waiver data exists, Coach may say a player is available.
+- If league waiver data does not exist, Coach must use "if available," "watch list," or roster-percentage language.
+- Coach should not claim a player is available in the user's league without league state.
+
+Coach should surface Player Tape-style usage trends:
+
+- Snap share.
+- Route participation.
+- Target share.
+- Carry share.
+- Red-zone usage.
+- Fantasy points vs projection.
+- Home/away splits.
+- Indoor/outdoor and schedule context.
 
 ## Stadium Map Piping
 

@@ -60,12 +60,13 @@ The application should render from 949 internal APIs, not directly from third-pa
 | Weather provider | V1 | Forecast by stadium and kickoff window, temp, wind, precipitation, roof relevance | Stadium Map, Your Players This Week, Coach, Player Tape | Use if SportsDataIO weather is unavailable or insufficient. |
 | NFL stadium metadata | V0/V1 | Coordinates, city, team, surface, roof/indoor/outdoor, timezone | Stadium Map, schedule context, player game context | Can seed manually for V0; validate with SportsDataIO later. |
 | Player headshots / team assets | V1 | Headshots, team colors, logos | Player Profile, Active Roster, Bench, Rankings, Draft Board | Nice-to-have for polish. Must have team colors for current layout intent. |
-| Waiver wire state | V1/V1.1 | Available players, rostered players, transaction history | Coach waiver advice, Your Players vs Field, roster weakness | Requires league sync or manual weekly refresh. |
+| Waiver wire state | V1/V1.1 | Available players, rostered players, transaction history | Coach waiver advice, Your Players vs Field, roster weakness | Requires league sync or manual weekly refresh. Without it, Coach must use "if available" language. |
+| Roster percentage / availability proxy | V1 | Player roster percentage, add/drop trend, broad waiver popularity | Coach watch list, fallback waiver-style insights | Needed when true league waiver state is unavailable. Could come from SportsDataIO/FantasyPros/FantasyLife/Fantasy Footballers-style data if licensed/available. |
 | Opponent lineup/matchup state | V1/V1.1 | Opponent roster, starters, projected/actual points | Analytics opponent actual/projected, Metrics opponent scope, Start/Sit opponent context | If missing, hide opponent claims or use tier benchmarks. |
 | League average / tier benchmark tables | V0 | Tier 1-3 positional averages, league starter averages, replacement baselines | Your Players vs Field, Draft Spend, Metrics fallback | Required fallback when full league data is missing. |
 | 949 projection model outputs | V0/V1 | Weekly projection, season projection, floor, median, ceiling, confidence, boom/bust, risk | Rankings, Start/Sit, Coach, Player Tape, Metrics, Analytics | Core proprietary layer. Can blend external projections and internal logic. |
 | 949 GM recommendation outputs | V0 | Draft score, value bands, survival probability, VORP, VOLS, VONA, snake value, spend grade | GM sidebar, Draft Score, Draft Board, Simulator | Deterministic engine output. |
-| 949 Coach recommendation outputs | V0/V1 | Start/sit action, lineup lift, floor/ceiling change, confidence, waiver/drop recommendations | Coach, Lineup Optimizer under Coach, Start/Sit Studio | Deterministic first; AI explains. |
+| 949 Coach recommendation outputs | V0/V1 | Conversational comparison, lineup read, lineup lift, floor/ceiling change, confidence, scenario result, watch/drop considerations | Coach, Lineup Optimizer under Coach, Start/Sit Studio | Deterministic first; AI explains. Advisory only; no automated team management. |
 | Saved draft simulator results | V0 | Simulator settings, picks, final roster, grade, missed recommendations | Draft Simulator, Drafting Guide, GM training | Internal table, no external API needed. |
 | Product analytics | V1 | Recommendation shown/followed, draft choices, Coach actions, feature usage | Model validation, admin/product analytics | PostHog or equivalent. Not required for user-facing V0. |
 | Error/observability data | V1 | API failures, provider sync errors, route errors | Reliability, debugging | Sentry or equivalent. |
@@ -82,7 +83,7 @@ The application should render from 949 internal APIs, not directly from third-pa
 | Analytics: Draft Spend | User draft picks + 949 draft rankings | Full league draft + ADP/platform-rank snapshots + actual points |
 | News | SportsDataIO news or seeded news | SportsDataIO news prioritized by roster + breaking tags |
 | Start/Sit Studio | User roster + weekly projections + dynamic slots | Injuries, opponent context, weather, matchup data |
-| Coach | Lineup/bench + projections + scoring | Waivers, injuries, opponent, weather, news, transactions |
+| Coach | Lineup/bench + projections + scoring + Player Tape trends | Waivers, roster percentage, injuries, opponent, weather, news, transactions |
 | Stadium Map | NFL schedule + stadium metadata | Weather + user/opponent players by game |
 | Your Players This Week | Active lineup + schedule | Weather, injuries, venue, opponent context |
 | Metrics Weekly Heatmap | User weekly points + dynamic roster slots | League/opponent/bench scopes from sync |

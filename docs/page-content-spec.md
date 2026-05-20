@@ -862,6 +862,8 @@ Recommendation rows should show:
 
 Coach is the in-season suggestion tool.
 
+Coach is advisory only. It should not automate, submit, or manage the user's fantasy lineup. 949Fantasy is the analytics layer that informs decisions the user implements on their actual fantasy platform, similar to how analytics dashboards influence decisions made inside ad platforms.
+
 Core content:
 
 - Current lineup.
@@ -869,22 +871,105 @@ Core content:
 - Waiver-wire candidates.
 - Projected team total.
 - Floor, median, and ceiling team range.
-- Start/sit swaps.
-- Waiver recommendations.
-- Drop candidates.
+- Conversational start/sit comparisons.
+- Insight review button.
+- Scenario views.
+- Trend-based watch/drop candidates.
 - Weakest position.
 - "No move needed" state when the team is already set well.
 
 Recommendation rows should show:
 
-- Action.
-- Player in.
-- Player out, if relevant.
+- Suggested consideration.
+- Player being compared.
+- Alternative player, if relevant.
 - Lineup lift.
 - Floor change.
 - Ceiling change.
 - Confidence.
 - Reason codes.
+
+Coach question examples:
+
+- "How's my lineup this week?"
+- "Should I play Mahomes over Allen?"
+- "Which WR has the best boom chance?"
+- "Who has the highest ceiling at RB on my team this week?"
+- "Who is trending down on my bench?"
+- "Do I have a safe drop for a position of need?"
+
+### Coach Insights
+
+Insights is a button-click template review.
+
+When clicked, Coach should review:
+
+- Active roster.
+- Bench.
+- Position groups.
+- Player trends.
+- Usage direction.
+- Upcoming matchup context.
+- Floor/ceiling balance.
+- Boom/bust profile.
+- Waiver-style opportunities if roster percentage data is available.
+
+Insight output should be quick and direct:
+
+- Lineup read.
+- Biggest strength.
+- Biggest risk.
+- Best bench upside.
+- Bench player trending down.
+- Position of need.
+- One optional watch/drop consideration.
+
+Coach should identify players whose offensive usage is trending down using Player Tape-style data:
+
+- Snap share trend.
+- Route participation trend.
+- Target share trend.
+- Carry share trend.
+- Red-zone usage trend.
+- Fantasy points vs projection trend.
+
+### Coach Scenarios
+
+Scenario buttons:
+
+- Highest Ceiling.
+- Best Boom Chance.
+- Safest Bet.
+- Best Floor.
+- Need Upside.
+- Protect Lead.
+
+Scenario outputs should explain the tradeoff. Example:
+
+```txt
+Moving from Player A to Player B raises projection from 100.0 to 100.4 but lowers your floor by 4.8. That is not enough projected gain to justify the added downside unless you specifically need ceiling.
+```
+
+### Coach Waiver Limits
+
+Waiver advice depends on available data.
+
+If connected league waiver data exists:
+
+- Coach can compare actual available players.
+
+If connected league waiver data does not exist:
+
+- Coach should use roster percentage, broad availability, or "watch list" language.
+- Coach should not claim a player is available in the user's league.
+- Coach can say "if available" or "check your platform."
+
+Useful fallback data:
+
+- Roster percentage.
+- Add/drop trend.
+- Waiver rank.
+- Projected role change.
 
 ## Player Profile
 

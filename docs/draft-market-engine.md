@@ -62,7 +62,9 @@ GM should also support a draft simulator mode. In simulator mode, computer-contr
 
 ### Coach
 
-Coach is the in-season assistant.
+Coach is the in-season conversational analytics assistant.
+
+Coach is advisory only. It does not automate lineup changes, submit transactions, or manage the user's fantasy platform account. The user remains in charge of implementing any decision on Yahoo, Sleeper, ESPN, or another fantasy platform.
 
 Inputs:
 
@@ -71,21 +73,35 @@ Inputs:
 - Starting lineup slots.
 - Bench.
 - Waiver-wire pool.
+- Roster percentage / broad availability data when true waiver state is unavailable.
 - Weekly projections.
 - Injuries.
 - Matchups.
 - Player trends.
+- Player usage trends.
+- Player Tape context.
 
 Outputs:
 
-- Start/sit suggestions.
-- Bench-to-starter swaps.
-- Waiver claims.
-- Drop candidates.
+- Conversational lineup evaluations.
+- Start/sit comparisons.
+- Ceiling, floor, boom, and safe-bet scenarios.
+- Insight reviews of lineup, bench, and position groups.
+- Trend-based watch/drop considerations.
 - Position weakness detection.
 - "No move needed" recommendation when the lineup is already set well.
 
 Coach should use the same market language where useful: every waiver claim has opportunity cost, every bench move changes lineup portfolio risk, and every player trend should be evaluated against acquisition cost.
+
+Coach should answer questions like:
+
+- "How's my lineup this week?"
+- "Should I play Mahomes over Allen?"
+- "Which WR has the best boom chance?"
+- "Who has the highest ceiling at RB on my team this week?"
+- "Who is trending down on my bench?"
+
+Coach should explain tradeoffs, not just rank players. A tiny projection increase may be a bad move if it meaningfully lowers the user's floor.
 
 ## Core Theories To Encode
 

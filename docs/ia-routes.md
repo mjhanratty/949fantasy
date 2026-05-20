@@ -32,7 +32,7 @@ Tier 1–3 positional benchmark when league/opponent data unavailable.
 | Metrics | `/metrics`, subroutes | `GET …/metrics/weekly-points` |
 | Performance | `/performance` | Same contracts as analytics (for now) |
 | Rankings | `/rankings` | Player/ranking APIs |
-| Lineup + Coach | `/lineup` | `GET/POST …/lineup`, `POST /api/coach/*` |
+| Lineup + **Coach** | `/lineup` (Coach shell on/near tab) | `GET/POST …/lineup`, `POST /api/coach/insight`, `POST /api/coach/question` — advisory only |
 | Games | `/games`, `/games/players` | `GET …/week/:week/stadium-map` |
 | Players | `/players` | `GET /api/players/:id/tape` |
 | **Draft** | `/draft` (hub) | See below |
@@ -49,10 +49,21 @@ Tier 1–3 positional benchmark when league/opponent data unavailable.
 | GM recommendations | `GET …/draft-room/:id/recommendations` (7 value bands) |
 | Simulator | `POST /api/gm/simulator`, autopick, result |
 
+## Coach (summary)
+
+- **Advisory only** — no automated lineup submits or transactions; user acts on their fantasy platform.
+- **Insights** — one-click lineup/bench/position review from deterministic outputs.
+- **Scenarios** — Highest Ceiling, Best Boom Chance, Safest Bet, Best Floor, Need Upside, Protect Lead (floor/ceiling tradeoff copy).
+- **Q&A** — head-to-head and lineup questions from structured context, not model memory.
+- **Waiver language** — claim availability only with league waiver data; else “if available” / roster-% / watch-list wording.
+- **Usage trends** — snap, routes, targets, carries, red zone, fantasy pts vs projection.
+
+See [page-content-spec.md](./page-content-spec.md) § Coach, [cursor-piping-handoff.md](./cursor-piping-handoff.md) § Coach Piping, [draft-market-engine.md](./draft-market-engine.md) § Coach.
+
 ## GM (summary)
 
-- Live mirror + simulator; shared snake board.
-- Seven sidebar bands (incl. Mid Steal, Expected, Mid Reach).
+- Live mirror + simulator; shared snake board; ESPN top-300 rank without full ESPN sync.
+- Seven sidebar bands (High/Mid Steal, Low Steal, Expected, Low/Mid/High Reach).
 - Details: [page-content-spec.md](./page-content-spec.md), [cursor-piping-handoff.md](./cursor-piping-handoff.md).
 
 ## HTML prototype (`prototype/src/`)
