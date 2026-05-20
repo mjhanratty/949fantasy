@@ -24,15 +24,18 @@ If those paths move, update this file and re-sync the vendored copies.
 
 ## GM v1 (page spec + engine)
 
-**Manual-first:** user clicks each drafted player; engine assigns `team_slot` from pick order (snake), no per-pick team picker.
+**Two modes** (same board layout):
 
-**Surfaces:**
+1. **Live mirror** — user clicks each pick as their real draft runs; `team_slot` from snake pick order (no platform API).
+2. **Draft simulator** — user picks at their slot; computer teams auto-draft between user turns. Presets: Platform ADP, Balanced, Sharp, Chaotic. Controls: auto-pick until my pick, undo, restart, save result. Outputs: draft grade, roster construction score, best steal / biggest reach, recap.
 
-- **Left rail** — value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
-- **Main grid** — interactive snake board (rounds × teams), position filters, undo, user column emphasized.
-- **Engine** — top-5 picks, survival probability, spend grade, tier cliffs, platform edge ([draft-market-engine](./draft-market-engine.md)).
+**Shared surfaces:**
 
-Planned code: `lib/draft-market/manual-board.ts`, pick-order, scoring, simulation, recommend.
+- **Left rail** — High Steal · Low Steal · Most Likely · Low Reach · High Reach.
+- **Main grid** — snake board, position filters, undo, user column emphasized.
+- **Engine** — top-5, survival probability, spend grade, tier cliffs, platform edge.
+
+Planned code: `manual-board.ts`, `simulator.ts`, `computer-drafters.ts`, `draft_simulator_results` table ([draft-market-engine](./draft-market-engine.md)).
 
 ## Navigation
 

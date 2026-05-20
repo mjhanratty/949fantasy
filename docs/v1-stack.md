@@ -345,6 +345,7 @@ Cursor should expect these entities in Supabase/Postgres:
 - `draft_simulation_runs`
 - `draft_player_recommendations`
 - `draft_value_bands`
+- `draft_simulator_results`
 - `draft_source_reliability`
 
 ## Proprietary Model Outputs

@@ -24,7 +24,7 @@ Collapsible **top nav** (horizontal); see page content spec for flyouts.
 | Games | `/games`, `/games/players`, `/games/trends` | Mock |
 | Players | `/players` | Mock |
 | Draft Data | `/draft-data` | Placeholder |
-| **GM** | `/gm` | Planned — [page-content-spec § GM](./page-content-spec.md): manual snake board, value bands, top-5 recs |
+| **GM** | `/gm` | Planned — live mirror + **draft simulator** (computer drafters), value bands, top-5 ([page-content-spec § GM](./page-content-spec.md)) |
 | **Coach** | `/coach` | Planned — start/sit, waivers, lineup lift |
 | Settings | `/settings`, `/settings/leagues` | Placeholder |
 | Player tape | `/playertape` | Mock |
@@ -33,12 +33,12 @@ Collapsible **top nav** (horizontal); see page content spec for flyouts.
 
 From [page-content-spec.md](./page-content-spec.md):
 
-- **Manual draft mirror** — click player when drafted; auto-assign team from `pick_number` + league size + snake (no API required for v1).
-- **Left rail** — High Steal · Low Steal · Most Likely · Low Reach · High Reach (updates each pick).
-- **Board** — rounds × team columns, position filters (All/QB/RB/WR/TE/FLEX/DST/K), undo, user column highlighted.
-- **State** — current pick, rosters, available pool, filter, undo stack; engine recomputes bands + recommendations after each action.
+- **Live mirror** — click player when drafted; auto-assign team from pick order (no platform API for v1).
+- **Draft simulator** — computer picks between user turns; presets Platform ADP / Balanced / Sharp / Chaotic; auto-pick until my pick; draft recap + grade on completion.
+- **Left rail** — value bands (updates each pick).
+- **Board** — snake grid, position filters, undo, shared layout for both modes.
 
-Engine tables/flow: [draft-market-engine.md](./draft-market-engine.md) (`draft_rooms`, `draft_room_picks`, `manual-board.ts`).
+Engine: [draft-market-engine.md](./draft-market-engine.md) — `draft_rooms`, `draft_room_picks`, `draft_simulator_results`, `manual-board.ts`, `simulator.ts`, `computer-drafters.ts`.
 
 ## HTML prototype view ids
 

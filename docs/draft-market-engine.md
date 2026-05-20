@@ -41,6 +41,7 @@ Inputs:
 Outputs:
 
 - Draft-position value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
+- Draft simulator mode against computer-controlled teams.
 - Best pick now.
 - Best value pick.
 - Safest pick.
@@ -56,6 +57,8 @@ V1 should use a manual draft board as the primary draft-state input. The user cl
 The user should only need to keep pace with the player selections. They should not need to choose the drafting team on every click. Team assignment is deterministic once GM knows league size, draft type, and the user's draft slot.
 
 Platform rank data should be supported separately from full platform integration. For example, ESPN top 300 rankings can power ESPN-specific GM market assumptions even if ESPN league sync is not available in V1.
+
+GM should also support a draft simulator mode. In simulator mode, computer-controlled teams make picks using the same ADP, platform-rank, roster-need, scarcity, and variance assumptions used by the availability simulation. The user drafts manually at their own picks.
 
 ### Coach
 
@@ -356,6 +359,8 @@ Fields:
 - `roster_slots_json`
 - `risk_profile`
 - `strategy_profile`
+- `mode`
+- `computer_behavior_preset`
 - `status`
 - `created_at`
 - `updated_at`
@@ -390,6 +395,8 @@ Fields:
 - `team_slot`
 - `team_name`
 - `is_user_team`
+- `is_computer_team`
+- `computer_behavior_preset`
 - `created_at`
 - `updated_at`
 
@@ -458,6 +465,28 @@ Fields:
 - `reason_codes`
 - `created_at`
 
+### `draft_simulator_results`
+
+Stores completed simulator runs.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `user_id`
+- `league_size`
+- `user_draft_slot`
+- `scoring_format`
+- `platform`
+- `computer_behavior_preset`
+- `final_roster_json`
+- `draft_grade`
+- `roster_construction_score`
+- `best_steal_pick_id`
+- `biggest_reach_pick_id`
+- `recommendation_follow_rate`
+- `created_at`
+
 ## Draft Pick Sequence
 
 For snake drafts:
@@ -491,6 +520,41 @@ For a 10-team snake draft, the team sequence is:
 ```
 
 This same sequence generalizes to any league size.
+
+In draft simulator mode:
+
+1. If `team_slot = user_draft_slot`, pause for the user's pick.
+2. If `team_slot != user_draft_slot`, auto-draft for the computer team.
+3. Insert the computer pick as a normal `draft_room_picks` record.
+4. Advance pick count.
+5. Continue until the user's next pick, pause, or draft completion.
+
+Computer pick logic should be configurable by preset:
+
+```txt
+platform_adp_pick_score =
+  platform_rank_score
+  + roster_need_weight
+  + small_random_variance
+
+balanced_pick_score =
+  platform_rank_score
+  + roster_need_score
+  + scarcity_score
+  + random_variance
+
+sharp_pick_score =
+  nine49_value_score
+  + platform_discount_score
+  + roster_need_score
+  + scarcity_score
+  + low_random_variance
+
+chaotic_pick_score =
+  platform_rank_score
+  + high_random_variance
+  + positional_run_bias
+```
 
 ## Engine Pipeline
 
@@ -589,6 +653,7 @@ Detect:
 - Late-round upside windows.
 - Position-specific breakout profiles.
 - Profitable plan deviations.
+- Simulator strategy outcomes.
 
 ### Step 6: Return Structured Recommendation
 
@@ -702,6 +767,8 @@ Suggested files:
 - `lib/draft-market/types.ts`
 - `lib/draft-market/pick-order.ts`
 - `lib/draft-market/manual-board.ts`
+- `lib/draft-market/simulator.ts`
+- `lib/draft-market/computer-drafters.ts`
 - `lib/draft-market/baselines.ts`
 - `lib/draft-market/scoring.ts`
 - `lib/draft-market/simulation.ts`
@@ -713,6 +780,8 @@ Suggested files:
 - `lib/draft-market/recommend.ts`
 - `app/api/gm/draft-room/route.ts`
 - `app/api/gm/draft-room/pick/route.ts`
+- `app/api/gm/simulator/route.ts`
+- `app/api/gm/simulator/autopick/route.ts`
 - `app/api/gm/recommendations/route.ts`
 
 Minimum viable behavior:
@@ -722,14 +791,16 @@ Minimum viable behavior:
 3. Let the user click a player to mark the current pick drafted.
 4. Assign the clicked player to the correct team by snake pick order.
 5. Support undo for the latest pick.
-6. Compute the user's next pick.
-7. Score all available players.
-8. Calculate VORP, VOLS, VONA, and smoothed snake value.
-9. Estimate survival probability using ADP-centered simulation.
-10. Apply platform edge and source reliability weighting.
-11. Classify players into High Steal, Low Steal, Most Likely, Low Reach, and High Reach bands.
-12. Return top 5 recommendations as JSON.
-13. Include reason codes and component scores.
+6. Add simulator mode where computer teams draft automatically.
+7. Support auto-pick until the user's next pick.
+8. Compute the user's next pick.
+9. Score all available players.
+10. Calculate VORP, VOLS, VONA, and smoothed snake value.
+11. Estimate survival probability using ADP-centered simulation.
+12. Apply platform edge and source reliability weighting.
+13. Classify players into High Steal, Low Steal, Most Likely, Low Reach, and High Reach bands.
+14. Return top 5 recommendations as JSON.
+15. Include reason codes and component scores.
 
 Do not add AI explanation until this JSON is stable.
 
@@ -790,7 +861,9 @@ Then it should explain the returned data.
 - Snake draft only.
 - Standard, half PPR, and full PPR.
 - Manual draft board as the primary draft state workflow.
+- Draft simulator mode against computer teams.
 - Click-to-draft player assignment by snake pick order.
+- Auto-pick until user's next pick.
 - Position filters: All, QB, RB, WR, TE, FLEX, DST, K.
 - Left-rail value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
 - Sleeper draft import only where easily available.

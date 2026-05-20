@@ -642,6 +642,7 @@ Core draft room content:
 - User roster.
 - Draft-position value column.
 - Interactive draft board.
+- Draft simulator mode.
 - Top 5 recommended picks.
 - Survival probability to next user pick.
 - Spend grade.
@@ -713,6 +714,65 @@ Round 3: 1,2,3,4,5,6,7,8,9,10
 ```
 
 If the user drafts 5th, GM knows every pick where `team_slot = 5` belongs to the user's team.
+
+### GM Draft Simulator
+
+GM should also include a draft simulator mode where the user drafts against computer-controlled teams.
+
+Purpose:
+
+- Let users practice from their actual draft slot.
+- Let users test roster construction strategies before draft day.
+- Let users understand which players and positions are likely to reach them.
+- Let users compare outcomes across platforms and scoring formats.
+
+Simulator setup:
+
+- Draft slot.
+- League size.
+- Draft type: snake for v1.
+- Scoring type.
+- Platform ranking basis.
+- Roster settings.
+- Computer draft behavior.
+- User risk preference.
+
+Computer draft behavior presets:
+
+- Platform ADP: computer teams mostly follow the selected platform's draft rank.
+- Balanced: computer teams blend platform rank, roster need, and positional scarcity.
+- Sharp: computer teams draft closer to 949 value and punish obvious discounts.
+- Chaotic: computer teams include more variance, reaches, and runs.
+
+Simulator behavior:
+
+- On computer picks, GM auto-selects a player for that team.
+- On user picks, GM pauses and shows the left-rail value bands and recommendations.
+- User can draft any available player, not only the recommendation.
+- The simulator continues until the draft is complete or the user exits.
+- At the end, GM produces a draft recap and roster grade.
+
+Simulator controls:
+
+- Start simulation.
+- Pause.
+- Auto-pick until my next pick.
+- Undo last pick.
+- Restart draft.
+- Save draft result.
+
+Simulator outputs:
+
+- Final roster.
+- Roster construction score.
+- Draft grade.
+- Best steal.
+- Biggest reach.
+- Position strengths and weaknesses.
+- Picks where GM recommendation differed from user choice.
+- Players repeatedly unavailable by the user's next pick across simulations.
+
+Draft simulator should reuse the same interactive board layout. The difference is that computer picks are filled automatically instead of requiring the user to mirror a real draft.
 
 Position filters:
 
