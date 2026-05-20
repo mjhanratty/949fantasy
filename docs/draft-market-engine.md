@@ -1,6 +1,6 @@
 # 949Fantasy Draft Market Engine
 
-> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md` · **Research:** [draft-theory-source-notes.md](./draft-theory-source-notes.md)
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md` · [draft-theory-source-notes.md](./draft-theory-source-notes.md) · [page-content-spec.md](./page-content-spec.md)
 
 ## Purpose
 
@@ -35,10 +35,12 @@ Inputs:
 - Platform: ESPN, Yahoo, Sleeper, CBS, NFL Fantasy, DraftKings, or manual.
 - Current draft state.
 - User roster state.
+- Manual draft-board clicks for V1.
 - Risk preference.
 
 Outputs:
 
+- Draft-position value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
 - Best pick now.
 - Best value pick.
 - Safest pick.
@@ -48,6 +50,12 @@ Outputs:
 - Probability target players survive to the user's next pick.
 - Spend efficiency grade.
 - Roster construction diagnosis.
+
+V1 should use a manual draft board as the primary draft-state input. The user clicks each selected player as their real draft happens, and GM assigns that player to the correct team by pick order. This bypasses fragile API dependencies while still giving the engine live draft context.
+
+The user should only need to keep pace with the player selections. They should not need to choose the drafting team on every click. Team assignment is deterministic once GM knows league size, draft type, and the user's draft slot.
+
+Platform rank data should be supported separately from full platform integration. For example, ESPN top 300 rankings can power ESPN-specific GM market assumptions even if ESPN league sync is not available in V1.
 
 ### Coach
 
@@ -368,6 +376,22 @@ Fields:
 - `position`
 - `picked_by_user`
 - `picked_at`
+- `entered_manually`
+- `undo_sequence`
+
+### `draft_room_teams`
+
+Stores team columns for the manual draft board.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `team_slot`
+- `team_name`
+- `is_user_team`
+- `created_at`
+- `updated_at`
 
 ### `draft_simulation_runs`
 
@@ -417,6 +441,23 @@ Fields:
 - `explanation_json`
 - `created_at`
 
+### `draft_value_bands`
+
+Stores the left-rail output for the current draft position.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `pick_number`
+- `band`
+- `player_id`
+- `draft_score`
+- `pick_value_delta`
+- `survival_probability_next_pick`
+- `reason_codes`
+- `created_at`
+
 ## Draft Pick Sequence
 
 For snake drafts:
@@ -431,6 +472,25 @@ else:
 ```
 
 The user's next picks are all future picks where `team_slot = user_draft_slot`.
+
+In the V1 manual draft board, every click should:
+
+1. Read the current `pick_number`.
+2. Convert it to `round`, `round_pick`, and `team_slot`.
+3. Insert a `draft_room_picks` record.
+4. Mark the player unavailable.
+5. Advance to the next pick.
+6. Recompute GM recommendations and value bands.
+
+Undo should remove or reverse only the latest manual pick unless a fuller pick-editing UI is built.
+
+For a 10-team snake draft, the team sequence is:
+
+```txt
+1,2,3,4,5,6,7,8,9,10,10,9,8,7,6,5,4,3,2,1
+```
+
+This same sequence generalizes to any league size.
 
 ## Engine Pipeline
 
@@ -532,11 +592,39 @@ Detect:
 
 ### Step 6: Return Structured Recommendation
 
+Before returning the top recommendation, the engine should classify available players into pick-value bands for the left rail.
+
+```txt
+pick_value_delta =
+  player_expected_pick_value
+  - current_pick_capital_value
+```
+
+Initial band rules:
+
+```txt
+High Steal: pick_value_delta >= high_steal_threshold
+Low Steal: pick_value_delta >= low_steal_threshold
+Most Likely: abs(pick_value_delta) < fair_value_threshold
+Low Reach: pick_value_delta <= low_reach_threshold
+High Reach: pick_value_delta <= high_reach_threshold
+```
+
+Thresholds should be normalized by round because a 10-pick gap means something different in Round 1 than Round 12.
+
 GM response object:
 
 ```json
 {
   "pick_number": 34,
+  "current_team_slot": 10,
+  "value_bands": {
+    "high_steal": ["player_123"],
+    "low_steal": ["player_456"],
+    "most_likely": ["player_789"],
+    "low_reach": ["player_321"],
+    "high_reach": ["player_654"]
+  },
   "recommendation": {
     "player_id": "player_123",
     "player_name": "Example Player",
@@ -613,6 +701,7 @@ Suggested files:
 
 - `lib/draft-market/types.ts`
 - `lib/draft-market/pick-order.ts`
+- `lib/draft-market/manual-board.ts`
 - `lib/draft-market/baselines.ts`
 - `lib/draft-market/scoring.ts`
 - `lib/draft-market/simulation.ts`
@@ -620,19 +709,27 @@ Suggested files:
 - `lib/draft-market/snake-value.ts`
 - `lib/draft-market/upside.ts`
 - `lib/draft-market/capital.ts`
+- `lib/draft-market/value-bands.ts`
 - `lib/draft-market/recommend.ts`
+- `app/api/gm/draft-room/route.ts`
+- `app/api/gm/draft-room/pick/route.ts`
 - `app/api/gm/recommendations/route.ts`
 
 Minimum viable behavior:
 
 1. Accept draft settings and current picks.
-2. Compute the user's next pick.
-3. Score all available players.
-4. Calculate VORP, VOLS, VONA, and smoothed snake value.
-5. Estimate survival probability using ADP-centered simulation.
-6. Apply platform edge and source reliability weighting.
-7. Return top 5 recommendations as JSON.
-8. Include reason codes and component scores.
+2. Render a manual draft board by team columns and round rows.
+3. Let the user click a player to mark the current pick drafted.
+4. Assign the clicked player to the correct team by snake pick order.
+5. Support undo for the latest pick.
+6. Compute the user's next pick.
+7. Score all available players.
+8. Calculate VORP, VOLS, VONA, and smoothed snake value.
+9. Estimate survival probability using ADP-centered simulation.
+10. Apply platform edge and source reliability weighting.
+11. Classify players into High Steal, Low Steal, Most Likely, Low Reach, and High Reach bands.
+12. Return top 5 recommendations as JSON.
+13. Include reason codes and component scores.
 
 Do not add AI explanation until this JSON is stable.
 
@@ -692,7 +789,11 @@ Then it should explain the returned data.
 
 - Snake draft only.
 - Standard, half PPR, and full PPR.
-- Manual draft room input plus Sleeper draft import where available.
+- Manual draft board as the primary draft state workflow.
+- Click-to-draft player assignment by snake pick order.
+- Position filters: All, QB, RB, WR, TE, FLEX, DST, K.
+- Left-rail value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
+- Sleeper draft import only where easily available.
 - Platform-aware ADP/rank source fields.
 - Top 5 recommendations.
 - Survival probability to next user pick.

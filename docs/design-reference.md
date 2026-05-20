@@ -36,7 +36,7 @@
 
 **Notable stack from the file head:** Google Fonts **Sora**, **Space Grotesk**, **JetBrains Mono**; CSS variables (`--black`, `--green-800`, `--mint`, `--mint-soft`, `--slate`, etc.) aligned with the 949 palette.
 
-**IA alignment:** wire view ids and nav to [ia-routes.md](./ia-routes.md) and the page content spec at `Documents/New project/949fantasy-page-content-spec.md`.
+**IA alignment:** wire view ids and nav to [ia-routes.md](./ia-routes.md) and [page-content-spec.md](./page-content-spec.md).
 
 ---
 

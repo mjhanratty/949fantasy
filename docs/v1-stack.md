@@ -53,6 +53,12 @@ Build 949Fantasy as a premium fantasy football intelligence platform with:
 
 For early testing, it is acceptable to use the RapidAPI `Creativesdev / NFL API Data` provider as a temporary data source while building the 949Fantasy model and interface.
 
+The broader provider priority is:
+
+- V0 Test: free NFL data, GM agent, Coach agent, and drafting guide.
+- V1 Core: SportsDataIO, Yahoo Fantasy API, Sleeper API, and platform ranking data.
+- V2 Expansion: ESPN integration through an adapter after the core system is stable.
+
 Use it only through a provider adapter. Do not call RapidAPI directly from React components or scatter provider-specific fields across the app.
 
 Recommended pattern:
@@ -261,8 +267,17 @@ Interpretation:
 Recommended order of operations:
 
 1. Start with Sleeper for the first real league import.
-2. Add Yahoo second if the product proves out and the OAuth path is worth the lift.
-3. Treat ESPN, CBS, and NFL Fantasy as research tracks until we confirm reliable production access.
+2. Add Yahoo as a V1 core integration if OAuth setup and data quality are confirmed.
+3. Ingest platform ranking data, including ESPN top 300, independently from full league sync.
+4. Treat ESPN full league integration as a V2 expansion track until a reliable production path is confirmed.
+5. Treat CBS and NFL Fantasy as research tracks until we confirm reliable production access.
+
+Important distinction:
+
+- Platform rankings are draft-market inputs.
+- League sync is roster/matchup state.
+
+GM can use ESPN top 300 rankings as a platform-rank input even if 949Fantasy does not yet support ESPN league import.
 
 ### Additional Support Data
 
@@ -325,9 +340,11 @@ Cursor should expect these entities in Supabase/Postgres:
 - `draft_theory_lessons`
 - `draft_market_snapshots`
 - `draft_rooms`
+- `draft_room_teams`
 - `draft_room_picks`
 - `draft_simulation_runs`
 - `draft_player_recommendations`
+- `draft_value_bands`
 - `draft_source_reliability`
 
 ## Proprietary Model Outputs

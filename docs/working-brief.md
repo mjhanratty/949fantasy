@@ -8,6 +8,8 @@
 - Cursor: application build.
 - Claude: UI exploration and visual design.
 
+When future page breakdowns include ownership labels, Codex should focus on the items under Codex and stay aware of Cursor/Claude work only where it affects data, logic, or implementation requirements. UI-only sections owned by Claude can be treated as context rather than Codex scope.
+
 ## Source Files
 
 - `/Users/matthewhanratty/Downloads/Fantasy Football V2.0.xlsx`
@@ -332,6 +334,58 @@ This means our provider plan must support not just rankings and projections, but
 4. Implement the visible screens from the PPTX mock as working flows.
 5. Add auth/subscription gating for premium boards and tools.
 6. Add validation dashboards for model accuracy: floor/ceiling hit rate, rank movement, projection error, value stability.
+
+## API Priority Stack
+
+### V0 Test
+
+Use the lightest available data path to prove the product logic before committing to paid or complex integrations.
+
+Priority:
+
+- Free NFL data.
+- GM agent.
+- Coach agent.
+- Drafting guide.
+
+V0 goal:
+
+- Prove the manual GM draft room.
+- Prove deterministic draft recommendations.
+- Prove post-draft roster reconstruction.
+- Prove early Coach recommendations against user-maintained roster state.
+- Validate that the drafting guide can teach and support the GM workflow.
+
+### V1 Core
+
+Use production-grade data and the most practical fantasy platform APIs.
+
+Priority:
+
+- SportsDataIO as the main NFL data provider.
+- Yahoo Fantasy API.
+- Sleeper API.
+- Platform rankings, including ESPN top 300 players, even if full ESPN league integration is deferred.
+
+V1 goal:
+
+- Replace free/prototype NFL data with reliable production data.
+- Support practical league imports where APIs are stable.
+- Keep platform-rank awareness separate from full league sync.
+- Allow GM to model ESPN draft rooms using ESPN rankings/top 300 even before ESPN account integration exists.
+
+### V2 Expansion
+
+Add harder integrations only after the core system is stable.
+
+Priority:
+
+- ESPN integration, carefully abstracted.
+
+V2 goal:
+
+- Add ESPN league sync without coupling 949Fantasy's data model to ESPN-specific assumptions.
+- Treat ESPN as one provider adapter among many, not as the product's source of truth.
 
 ## Current Open Questions
 
