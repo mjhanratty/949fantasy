@@ -1,54 +1,57 @@
 # 949Fantasy product context (external briefs)
 
-Authoritative product, metrics, and engineering briefs live **outside this repo** on the primary dev machine. Open them when planning features, routes, data models, or integrations.
+Authoritative product, metrics, and engineering briefs live **outside this repo** on the primary dev machine.
 
 | Document | Path | In-repo copy |
 |----------|------|----------------|
-| Working brief | `/Users/matthewhanratty/Documents/New project/949fantasy-working-brief.md` | [working-brief.md](./working-brief.md) |
-| V1 stack | `/Users/matthewhanratty/Documents/New project/949fantasy-v1-stack.md` | [v1-stack.md](./v1-stack.md) |
-| Page content spec | `/Users/matthewhanratty/Documents/New project/949fantasy-page-content-spec.md` | [page-content-spec.md](./page-content-spec.md) |
-| Metrics glossary | `/Users/matthewhanratty/Documents/New project/949fantasy-metrics-glossary.md` | — (external only) |
-| Draft market engine | `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md` | [draft-market-engine.md](./draft-market-engine.md) |
-| Draft theory source notes | `/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md` | [draft-theory-source-notes.md](./draft-theory-source-notes.md) |
+| Working brief | `…/949fantasy-working-brief.md` | [working-brief.md](./working-brief.md) |
+| **Cursor piping handoff** | `…/949fantasy-cursor-piping-handoff.md` | [cursor-piping-handoff.md](./cursor-piping-handoff.md) |
+| V1 stack | `…/949fantasy-v1-stack.md` | [v1-stack.md](./v1-stack.md) |
+| Page content spec | `…/949fantasy-page-content-spec.md` | [page-content-spec.md](./page-content-spec.md) |
+| Metrics glossary | `…/949fantasy-metrics-glossary.md` | — (external) |
+| Draft market engine | `…/949fantasy-draft-market-engine.md` | [draft-market-engine.md](./draft-market-engine.md) |
+| Draft theory source notes | `…/949fantasy-draft-theory-source-notes.md` | [draft-theory-source-notes.md](./draft-theory-source-notes.md) |
 
-If those paths move, update this file and re-sync the vendored copies.
+Base path: `/Users/matthewhanratty/Documents/New project/`
 
-## In-repo companions
+## Who does what
 
-- [page-content-spec.md](./page-content-spec.md) — FigJam → screens; **GM** manual draft board, value bands, **Coach**; flyouts and data deps.
-- [working-brief.md](./working-brief.md) — Mission, brand, Codex/Cursor/Claude scope, IA, data gaps.
-- [v1-stack.md](./v1-stack.md) — Stack, provider matrix, schema, model outputs, build order.
-- [draft-theory-source-notes.md](./draft-theory-source-notes.md) → [draft-market-engine.md](./draft-market-engine.md) — GM scoring + `manual-board` pipeline.
-- [ia-routes.md](./ia-routes.md) — Route map.
-- [design-reference.md](./design-reference.md) — HTML prototypes.
+| Owner | Scope |
+|-------|--------|
+| **Codex** | Product logic, metrics, schemas, provider strategy, Supabase/Vercel data |
+| **Cursor** | App build — wire views to typed APIs per [cursor-piping-handoff.md](./cursor-piping-handoff.md) |
+| **Claude** | Visual/UI exploration |
 
-## GM v1 (page spec + engine)
+## Cursor implementation (piping handoff)
 
-**Two modes** (same board layout):
+**Replace** prototype `window.*` mocks with franchise-scoped API contracts.
 
-1. **Live mirror** — user clicks each pick as their real draft runs; `team_slot` from snake pick order (no platform API).
-2. **Draft simulator** — user picks at their slot; computer teams auto-draft between user turns. Presets: Platform ADP, Balanced, Sharp, Chaotic. Controls: auto-pick until my pick, undo, restart, save result. Outputs: draft grade, roster construction score, best steal / biggest reach, recap.
+**Global:** franchise/team selector + setup questionnaire; data modes: `connected_league` · `manual_draft_room` · `manual_user_roster` · `demo_or_empty`; tier 1–3 benchmark fallback when league/opponent data missing.
 
-**Shared surfaces:**
+**Draft tab** (new): Draft Rankings · Draft Board · Draft Score · GM · Simulator — see handoff § Draft Tab Piping.
 
-- **Left rail** — High Steal · Low Steal · Most Likely · Low Reach · High Reach.
-- **Main grid** — snake board, position filters, undo, user column emphasized.
-- **Engine** — top-5, survival probability, spend grade, tier cliffs, platform edge.
+**GM sidebar bands (7):** High Steal · Mid Steal · Low Steal · Expected · Low Reach · Mid Reach · High Reach.
 
-Planned code: `manual-board.ts`, `simulator.ts`, `computer-drafters.ts`, `draft_simulator_results` table ([draft-market-engine](./draft-market-engine.md)).
+**Coach:** on Start/Sit — `POST /api/coach/insight`, `POST /api/coach/question`; structured outputs only.
 
-## Navigation
+**Non-negotiable:** no provider calls from React; dynamic roster slots; manual draft board + manual roster upload are first-class fallbacks.
 
-Snapshot · Metrics · Performance · Rankings · Lineup · Games · Players · Draft Data · **GM** · **Coach** · Settings — [ia-routes.md](./ia-routes.md).
+Full route list and TypeScript shapes: [cursor-piping-handoff.md](./cursor-piping-handoff.md).
+
+## Related specs
+
+- Screens / GM UI: [page-content-spec.md](./page-content-spec.md)
+- Engine math: [draft-market-engine.md](./draft-market-engine.md)
+- Routes map: [ia-routes.md](./ia-routes.md)
+- Prototype source: [design-reference.md](./design-reference.md) → `prototype/src/`
 
 ## Sync vendored docs
 
 ```bash
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-working-brief.md" docs/working-brief.md
+cp "/Users/matthewhanratty/Documents/New project/949fantasy-cursor-piping-handoff.md" docs/cursor-piping-handoff.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-v1-stack.md" docs/v1-stack.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-page-content-spec.md" docs/page-content-spec.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md" docs/draft-market-engine.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md" docs/draft-theory-source-notes.md
 ```
-
-Metrics glossary stays external only.

@@ -36,7 +36,7 @@
 
 **Notable stack from the file head:** Google Fonts **Sora**, **Space Grotesk**, **JetBrains Mono**; CSS variables (`--black`, `--green-800`, `--mint`, `--mint-soft`, `--slate`, etc.) aligned with the 949 palette.
 
-**IA alignment:** wire view ids and nav to [ia-routes.md](./ia-routes.md) and [page-content-spec.md](./page-content-spec.md).
+**IA alignment:** [ia-routes.md](./ia-routes.md), [page-content-spec.md](./page-content-spec.md). **Replace `window.*` mocks per** [cursor-piping-handoff.md](./cursor-piping-handoff.md).
 
 ---
 
