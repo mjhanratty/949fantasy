@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>949</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23050807'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Archivo' font-weight='900' font-size='42' fill='%2395F9AE'%3E949%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --black: #050807;
+    --green-900: #0c1a13;
+    --green-800: #163824;
+    --green-700: #1d4a30;
+    --green-600: #2A4A37;
+    --mint: #95F9AE;
+    --mint-soft: #D9FFE4;
+    --slate: #A6B7AC;
+    --slate-dim: #6b7d72;
+    --red: #FF5E5E;
+    --gold: #F2C94C;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--black); color: var(--mint-soft); }
+  body {
+    font-family: "Sora", system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--mint); color: var(--black); }
+
+  /* scrollbars */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--green-600); border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--green-700); }
+
+  /* utility classes used across views */
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .display { font-family: "Sora", system-ui, sans-serif; font-weight: 800; letter-spacing: -0.035em; }
+  .num { font-family: "Space Grotesk", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+  .pos-up { color: var(--mint); }
+  .pos-down { color: var(--red); }
+  .pos-warn { color: var(--gold); }
+
+  /* shared chip / pill / button bases pulled into a style sheet so individual components stay terse */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    border: 1px solid var(--green-600);
+    color: var(--slate);
+    background: rgba(22,56,36,0.4);
+  }
+  .chip.mint { color: var(--mint); border-color: rgba(149,249,174,0.4); background: rgba(149,249,174,0.08); }
+  .chip.gold { color: var(--gold); border-color: rgba(242,201,76,0.35); background: rgba(242,201,76,0.08); }
+  .chip.red { color: var(--red); border-color: rgba(255,94,94,0.35); background: rgba(255,94,94,0.08); }
+  .chip.soft { color: var(--mint-soft); border-color: rgba(217,255,228,0.25); background: rgba(217,255,228,0.04); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; border-radius: var(--radius); border: 1px solid transparent;
+    font-family: "Sora", sans-serif; font-weight: 600; font-size: 13px;
+    cursor: pointer; transition: all 0.15s ease;
+    background: var(--mint); color: var(--black);
+  }
+  .btn:hover { background: #aafcc0; }
+  .btn.ghost { background: transparent; color: var(--mint-soft); border-color: var(--green-600); }
+  .btn.ghost:hover { background: var(--green-800); border-color: var(--green-700); }
+  .btn.outline { background: transparent; color: var(--mint); border-color: var(--mint); }
+  .btn.outline:hover { background: rgba(149,249,174,0.08); }
+
+  .card {
+    background: var(--green-800);
+    border: 1px solid var(--green-600);
+    border-radius: var(--radius);
+  }
+
+  /* tiny tick element for grid line ornament */
+  .tick { width: 6px; height: 6px; border-radius: 1px; background: var(--mint); display: inline-block; }
+
+  /* used by sparkline svgs */
+  .spark-line { fill: none; stroke: var(--mint); stroke-width: 1.5; }
+  .spark-line.down { stroke: var(--red); }
+  .spark-line.flat { stroke: var(--slate); }
+  .spark-area { fill: url(#sparkfill); opacity: 0.4; }
+
+  /* number ticker style for big stats */
+  .stat-num {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+  }
+
+  /* fade in */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .view-enter { animation: fadeIn 0.25s ease both; }
+
+  /* placeholder dot */
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 0 0 rgba(149,249,174,0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(149,249,174,0.6); }
+    70% { box-shadow: 0 0 0 6px rgba(149,249,174,0); }
+    100% { box-shadow: 0 0 0 0 rgba(149,249,174,0); }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="src/us-map-paths.js"></script>
+<script type="text/babel" src="src/data.jsx"></script>
+<script type="text/babel" src="src/icons.jsx"></script>
+<script type="text/babel" src="src/primitives.jsx"></script>
+<script type="text/babel" src="src/views/landing.jsx"></script>
+<script type="text/babel" src="src/views/dashboard.jsx"></script>
+<script type="text/babel" src="src/views/metrics.jsx"></script>
+<script type="text/babel" src="src/views/statistics.jsx"></script>
+<script type="text/babel" src="src/views/rankings.jsx"></script>
+<script type="text/babel" src="src/views/player.jsx"></script>
+<script type="text/babel" src="src/views/lineup.jsx"></script>
+<script type="text/babel" src="src/views/stadium-map.jsx"></script>
+<script type="text/babel" src="src/views/games.jsx"></script>
+<script type="text/babel" src="src/views/playertape.jsx"></script>
+<script type="text/babel" src="src/tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>

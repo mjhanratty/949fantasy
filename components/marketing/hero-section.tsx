@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HeroMark } from "@/components/marketing/hero-mark";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -57,10 +58,11 @@ export function HeroSection() {
       />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-24">
         <div className="flex flex-col gap-6">
+          <HeroMark className="aspect-[1200/800] w-full max-w-[280px] overflow-hidden rounded-lg border border-divider shadow-[0_0_0_1px_rgba(149,249,174,0.06)]" />
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-mint">
             Fantasy intelligence platform
           </p>
-          <h1 className="font-display text-5xl leading-[0.95] tracking-tight text-white-mint sm:text-6xl lg:text-7xl">
+          <h1 className="font-display text-5xl leading-[0.95] text-white-mint sm:text-6xl lg:text-7xl">
             Sharper signal.
             <span className="block text-mint">Better decisions.</span>
           </h1>
@@ -94,10 +96,7 @@ export function HeroSection() {
               Scoring
             </span>
             {scoringFormats.map((label) => (
-              <span
-                key={label}
-                className="rounded-full border border-divider bg-surface/60 px-3 py-1 text-xs font-medium text-white-mint"
-              >
+              <span key={label} className="chip chip-mint">
                 {label}
               </span>
             ))}
@@ -105,7 +104,7 @@ export function HeroSection() {
         </div>
         <div className="relative flex min-h-[220px] items-end justify-center lg:min-h-[320px]">
           <AnalyticsMotif className="absolute inset-x-0 bottom-0 h-48 w-full max-w-md opacity-90 lg:h-56" />
-          <div className="relative z-10 w-full max-w-md rounded-xl border border-divider bg-surface/80 p-5 shadow-[0_0_0_1px_rgba(149,249,174,0.08)] ring-1 ring-mint/10 backdrop-blur-sm">
+          <div className="relative z-10 w-full max-w-md rounded-xl border border-divider bg-green-900/40 p-5 shadow-[0_0_0_1px_rgba(149,249,174,0.08)] ring-1 ring-mint/10 backdrop-blur-sm">
             <div className="mb-4 flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-mint">
                 Live preview
@@ -129,8 +128,8 @@ export function HeroSection() {
                     <p className="text-xs text-slate-text">Floor — ceiling (70% band)</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold tabular-nums text-mint">{row.pts}</p>
-                    <p className="text-[11px] tabular-nums text-slate-text">{row.band}</p>
+                    <p className="font-stat text-sm text-mint">{row.pts}</p>
+                    <p className="font-data text-[11px] text-slate-text">{row.band}</p>
                   </div>
                 </div>
               ))}

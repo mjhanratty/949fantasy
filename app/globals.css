@@ -11,12 +11,21 @@
   --color-surface: #050807;
   --color-slate-text: #a6b7ac;
   --color-divider: #2a4a37;
+  /* 949fantsyv2.html design tokens */
+  --color-green-900: #0c1a13;
+  --color-green-700: #1d4a30;
+  --color-green-600: #2a4a37;
+  --color-slate-dim: #6b7d72;
+  --color-gold: #f2c94c;
+  --color-signal-red: #ff5e5e;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-geist-sans);
+  --font-sans: var(--font-sora);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-data: var(--font-jetbrains-mono);
+  --font-stat: var(--font-space-grotesk);
+  --font-heading: var(--font-sora);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,8 +55,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.67);
+  --radius-md: calc(var(--radius) * 0.83);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
@@ -55,7 +64,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* 949Fantasy luxury dark theme: same tokens for :root and .dark (html uses class="dark") */
+/* 949Fantasy luxury dark theme (aligned with 949fantsyv2.html :root) */
 :root,
 .dark {
   --background: #050807;
@@ -65,14 +74,14 @@
   --popover: #163824;
   --popover-foreground: #d9ffe4;
   --primary: #95f9ae;
-  --primary-foreground: #163824;
-  --secondary: #1a3025;
+  --primary-foreground: #050807;
+  --secondary: #0c1a13;
   --secondary-foreground: #d9ffe4;
   --muted: #1a3025;
   --muted-foreground: #a6b7ac;
   --accent: #2a4a37;
   --accent-foreground: #95f9ae;
-  --destructive: #c45c5c;
+  --destructive: #ff5e5e;
   --border: #2a4a37;
   --input: #2a4a37;
   --ring: #95f9ae;
@@ -81,11 +90,12 @@
   --chart-3: #2a4a37;
   --chart-4: #a6b7ac;
   --chart-5: #d9ffe4;
-  --radius: 0.625rem;
+  /* 12px card radius from v2 */
+  --radius: 0.75rem;
   --sidebar: #163824;
   --sidebar-foreground: #d9ffe4;
   --sidebar-primary: #95f9ae;
-  --sidebar-primary-foreground: #163824;
+  --sidebar-primary-foreground: #050807;
   --sidebar-accent: #2a4a37;
   --sidebar-accent-foreground: #d9ffe4;
   --sidebar-border: #2a4a37;
@@ -98,14 +108,102 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
   html {
     @apply font-sans scroll-smooth;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #1d4a30;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: var(--font-bebas), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+  .font-data {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .font-stat {
+    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-divider px-2.5 py-1 font-mono text-[11px] font-medium uppercase tracking-wide text-slate-text;
+    background: rgba(22, 56, 36, 0.4);
+  }
+  .chip-mint {
+    @apply border-mint/40 bg-mint/10 text-mint;
+  }
+  .pos-up {
+    @apply text-mint;
+  }
+  .pos-down {
+    @apply text-signal-red;
+  }
+  .pos-warn {
+    @apply text-gold;
+  }
+  .view-enter {
+    animation: viewEnter 0.25s ease both;
+  }
+  /* v2 prototype utility aliases */
+  .mono {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .display {
+    font-family: var(--font-sora), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+  .num {
+    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .card {
+    background: #163824;
+    border: 1px solid #2a4a37;
+    border-radius: 12px;
+  }
+  .stat-num {
+    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+  }
+}
+
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

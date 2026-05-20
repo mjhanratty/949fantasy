@@ -165,7 +165,7 @@ export function RankingsPreviewCard() {
           </CardHeader>
           <CardContent className="px-0 pb-0 pt-0">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-sm">
+              <table className="w-full min-w-[640px] text-left font-mono text-sm">
                 <thead>
                   <tr className="border-b border-divider bg-surface/40 text-[11px] font-semibold uppercase tracking-wider text-slate-text">
                     <th className="px-4 py-3 font-medium">Player</th>

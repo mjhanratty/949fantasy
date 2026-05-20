@@ -12,6 +12,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             949<span className="text-mint">Fantasy</span>
           </Link>
           <nav className="flex items-center gap-4 text-sm text-slate-text">
+            <Link
+              href="/snapshot"
+              className="hover:text-mint transition-colors font-medium text-white-mint/90"
+            >
+              App
+            </Link>
             <a href="#rankings-preview" className="hover:text-mint transition-colors">
               Edge Board
             </a>
