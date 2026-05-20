@@ -65,9 +65,11 @@ The application should render from 949 internal APIs, not directly from third-pa
 | Opponent lineup/matchup state | V1/V1.1 | Opponent roster, starters, projected/actual points | Analytics opponent actual/projected, Metrics opponent scope, Start/Sit opponent context | If missing, hide opponent claims or use tier benchmarks. |
 | League average / tier benchmark tables | V0 | Tier 1-3 positional averages, league starter averages, replacement baselines | Your Players vs Field, Draft Spend, Metrics fallback | Required fallback when full league data is missing. |
 | 949 projection model outputs | V0/V1 | Weekly projection, season projection, floor, median, ceiling, confidence, boom/bust, risk | Rankings, Start/Sit, Coach, Player Tape, Metrics, Analytics | Core proprietary layer. Can blend external projections and internal logic. |
-| 949 GM recommendation outputs | V0 | Draft score, value bands, survival probability, VORP, VOLS, VONA, snake value, spend grade | GM sidebar, Draft Score, Draft Board, Simulator | Deterministic engine output. |
+| 949 GM recommendation outputs | V0 | Draft score, seven value bands, survival probability, VORP, VOLS, VONA, snake value, spend grade, run alerts, queue status | GM sidebar, Draft Score, Draft Board, Simulator | Deterministic engine output. |
+| 949 value grade outputs | V0 | Last season grade, projected grade, career grade, value score vs position average | GM, Draft Rankings, Player Profile, Draft Score | Uses `player_points / position_group_average_points`. |
 | 949 Coach recommendation outputs | V0/V1 | Conversational comparison, lineup read, lineup lift, floor/ceiling change, confidence, scenario result, watch/drop considerations | Coach, Lineup Optimizer under Coach, Start/Sit Studio | Deterministic first; AI explains. Advisory only; no automated team management. |
 | Saved draft simulator results | V0 | Simulator settings, picks, final roster, grade, missed recommendations | Draft Simulator, Drafting Guide, GM training | Internal table, no external API needed. |
+| Historical workbook validation data | V0/V1 | Actual points, projected points, floor, ceiling, tiers, value formulas, injury flags if available | Projection model validation, value grades, trust testing | User will provide updated `.xlsx`; process with Python validation scripts. |
 | Product analytics | V1 | Recommendation shown/followed, draft choices, Coach actions, feature usage | Model validation, admin/product analytics | PostHog or equivalent. Not required for user-facing V0. |
 | Error/observability data | V1 | API failures, provider sync errors, route errors | Reliability, debugging | Sentry or equivalent. |
 | Stripe/subscription entitlement | V1 | User entitlement, season pass status | Premium gates across Rankings, Coach, GM, Draft tools | Not required for product logic tests. |
@@ -93,7 +95,7 @@ The application should render from 949 internal APIs, not directly from third-pa
 | Draft Rankings | 949 rankings + player pool | Platform ranks, ADP, risk, tiers, projections |
 | Draft Board | Draft settings + player pool + platform rank | Full platform rank snapshots + GM recommendations |
 | Draft Score | Draft picks + 949 draft scoring | ADP/platform rank + full league draft context |
-| GM Sidebar | Draft room state + 949 GM engine | Platform rank, ADP, simulation, roster construction |
+| GM Sidebar | Draft room state + 949 GM engine | Platform rank, ADP, simulation, roster construction, run alerts, queue status |
 | Draft Simulator | Player pool + computer drafter rules | Platform ADP/rank + 949 recommendations + saved results |
 
 ## Data Connections To Build In Vercel
@@ -108,6 +110,7 @@ The application should render from 949 internal APIs, not directly from third-pa
 - Manual GM draft room routes.
 - GM deterministic scoring routes.
 - Coach context and insight routes using structured outputs.
+- Python workbook validation scripts for floor/ceiling, value grades, and projection error.
 
 ### V1 Core
 

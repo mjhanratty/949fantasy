@@ -47,7 +47,11 @@ Tier 1–3 positional benchmark when league/opponent data unavailable.
 | Draft Board (live) | `POST/GET /api/gm/draft-room`, pick, undo |
 | Draft Score | `GET …/draft-room/:id/score` |
 | GM recommendations | `GET …/draft-room/:id/recommendations` (7 value bands) |
-| Simulator | `POST /api/gm/simulator`, autopick, result |
+| GM ticker | `GET …/draft-room/:id/ticker` |
+| GM queue | `GET/POST/DELETE …/draft-room/:id/queue` |
+| GM alerts (position runs) | `GET …/alerts`, dismiss |
+| Player value grades | `GET /api/players/:id/value-grades` |
+| Simulator | `POST /api/gm/simulator`, autopick, result (varied computer behavior) |
 
 ## Coach (summary)
 
@@ -62,9 +66,11 @@ See [page-content-spec.md](./page-content-spec.md) § Coach, [cursor-piping-hand
 
 ## GM (summary)
 
-- Live mirror + simulator; shared snake board; ESPN top-300 rank without full ESPN sync.
-- Seven sidebar bands (High/Mid Steal, Low Steal, Expected, Low/Mid/High Reach).
-- Details: [page-content-spec.md](./page-content-spec.md), [cursor-piping-handoff.md](./cursor-piping-handoff.md).
+- Live mirror + simulator; shared snake board; `boardMode: available | selected`.
+- Seven sidebar bands; **ticker tape**; **queue** with status dots; **position-run alerts**.
+- **Value grades** (last season / projected / career, A+–F from value vs position avg).
+- Simulator: presets + controlled randomness (reaches, steals, runs).
+- Details: [page-content-spec.md](./page-content-spec.md), [cursor-piping-handoff.md](./cursor-piping-handoff.md), [draft-market-engine.md](./draft-market-engine.md).
 
 ## HTML prototype (`prototype/src/`)
 

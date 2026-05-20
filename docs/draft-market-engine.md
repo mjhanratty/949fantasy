@@ -24,7 +24,7 @@ The product should not depend on an LLM to invent football recommendations. The 
 
 ### GM
 
-GM is the draft-day assistant.
+GM is the draft-day nudge engine.
 
 Inputs:
 
@@ -40,7 +40,11 @@ Inputs:
 
 Outputs:
 
-- Draft-position value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
+- Draft-position value bands: High Steal, Mid Steal, Low Steal, Expected, Low Reach, Mid Reach, High Reach.
+- Pick ticker tape with live pick grades.
+- Available / selected board state.
+- Queue red/yellow/green indicators.
+- Position run alerts.
 - Draft simulator mode against computer-controlled teams.
 - Best pick now.
 - Best value pick.
@@ -59,6 +63,8 @@ The user should only need to keep pace with the player selections. They should n
 Platform rank data should be supported separately from full platform integration. For example, ESPN top 300 rankings can power ESPN-specific GM market assumptions even if ESPN league sync is not available in V1.
 
 GM should also support a draft simulator mode. In simulator mode, computer-controlled teams make picks using the same ADP, platform-rank, roster-need, scarcity, and variance assumptions used by the availability simulation. The user drafts manually at their own picks.
+
+GM V1 should mostly avoid deep conversational behavior. It should answer through the live draft board, seven-option sidebar, ticker tape, queue dots, and alerts. User-prompted GM questions can come later for paid/pro tiers.
 
 ### Coach
 
@@ -399,6 +405,9 @@ Fields:
 - `picked_at`
 - `entered_manually`
 - `undo_sequence`
+- `draft_grade`
+- `value_band`
+- `pick_value_delta`
 
 ### `draft_room_teams`
 
@@ -481,6 +490,79 @@ Fields:
 - `reason_codes`
 - `created_at`
 
+### `draft_pick_ticker_items`
+
+Stores live pick-grade events for the ticker tape.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `pick_id`
+- `pick_number`
+- `round`
+- `team_slot`
+- `player_id`
+- `position`
+- `draft_grade`
+- `value_band`
+- `reason_codes`
+- `created_at`
+
+### `draft_queues`
+
+Stores user queued players for a draft room.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `user_id`
+- `player_id`
+- `queue_order`
+- `status_color`
+- `survival_probability_next_pick`
+- `queue_reason_codes`
+- `created_at`
+- `updated_at`
+
+### `draft_run_alerts`
+
+Stores position-run alerts.
+
+Fields:
+
+- `id`
+- `draft_room_id`
+- `pick_number`
+- `position`
+- `severity`
+- `recent_pick_window`
+- `picks_in_run`
+- `remaining_tier_count`
+- `user_roster_need_score`
+- `dismissed_at`
+- `created_at`
+
+### `player_value_grades`
+
+Stores 949 value grades by season/projection/career.
+
+Fields:
+
+- `id`
+- `player_id`
+- `position`
+- `scoring_format`
+- `grade_scope`
+- `points`
+- `position_average_points`
+- `value_score`
+- `grade`
+- `sample_size`
+- `model_version`
+- `created_at`
+
 ### `draft_simulator_results`
 
 Stores completed simulator runs.
@@ -523,9 +605,11 @@ In the V1 manual draft board, every click should:
 1. Read the current `pick_number`.
 2. Convert it to `round`, `round_pick`, and `team_slot`.
 3. Insert a `draft_room_picks` record.
-4. Mark the player unavailable.
-5. Advance to the next pick.
-6. Recompute GM recommendations and value bands.
+4. Score the pick using draft capital, available players, team need, projection, ADP, platform rank, and value grade.
+5. Insert a ticker item with pick grade and value band.
+6. Mark the player unavailable.
+7. Advance to the next pick.
+8. Recompute GM recommendations, value bands, queue dots, and run alerts.
 
 Undo should remove or reverse only the latest manual pick unless a fuller pick-editing UI is built.
 
@@ -571,6 +655,8 @@ chaotic_pick_score =
   + high_random_variance
   + positional_run_bias
 ```
+
+Computer teams should not select the same way every simulation. Each preset should include controlled randomness so simulations contain a realistic mix of expected picks, reaches, steals, and position runs.
 
 ## Engine Pipeline
 
@@ -670,6 +756,8 @@ Detect:
 - Position-specific breakout profiles.
 - Profitable plan deviations.
 - Simulator strategy outcomes.
+- Queue target value changes.
+- Ticker-worthy pick grades.
 
 ### Step 6: Return Structured Recommendation
 
@@ -685,13 +773,36 @@ Initial band rules:
 
 ```txt
 High Steal: pick_value_delta >= high_steal_threshold
+Mid Steal: pick_value_delta >= mid_steal_threshold
 Low Steal: pick_value_delta >= low_steal_threshold
-Most Likely: abs(pick_value_delta) < fair_value_threshold
+Expected: abs(pick_value_delta) < fair_value_threshold
 Low Reach: pick_value_delta <= low_reach_threshold
+Mid Reach: pick_value_delta <= mid_reach_threshold
 High Reach: pick_value_delta <= high_reach_threshold
 ```
 
 Thresholds should be normalized by round because a 10-pick gap means something different in Round 1 than Round 12.
+
+The `Expected` player is the central expected pick for the user's current draft slot and active filter. The steal bands above represent increasingly strong discounts. The reach bands below represent increasingly aggressive upside/sleeper plays, not automatically bad picks.
+
+949 value grade formula:
+
+```txt
+player_value = player_points / position_group_average_points
+```
+
+Initial grade mapping:
+
+```txt
+A+: player_value > 1.00
+A:  0.90 <= player_value <= 1.00
+B:  0.80 <= player_value < 0.90
+C:  0.70 <= player_value < 0.80
+D:  0.60 <= player_value < 0.70
+F:  player_value < 0.60, meaning anything below 0.60
+```
+
+Store last-season, projected, and career versions where data exists.
 
 GM response object:
 
@@ -701,11 +812,33 @@ GM response object:
   "current_team_slot": 10,
   "value_bands": {
     "high_steal": ["player_123"],
-    "low_steal": ["player_456"],
-    "most_likely": ["player_789"],
+    "mid_steal": ["player_456"],
+    "low_steal": ["player_789"],
+    "expected": ["player_101"],
     "low_reach": ["player_321"],
-    "high_reach": ["player_654"]
+    "mid_reach": ["player_654"],
+    "high_reach": ["player_987"]
   },
+  "ticker_item": {
+    "pick_number": 33,
+    "player_id": "player_333",
+    "draft_grade": "A",
+    "value_band": "Expected"
+  },
+  "run_alerts": [
+    {
+      "position": "WR",
+      "severity": "medium",
+      "message": "WR run detected: 4 WRs selected in the last 7 picks."
+    }
+  ],
+  "queue": [
+    {
+      "player_id": "player_777",
+      "status_color": "yellow",
+      "survival_probability_next_pick": 0.31
+    }
+  ],
   "recommendation": {
     "player_id": "player_123",
     "player_name": "Example Player",
@@ -793,9 +926,16 @@ Suggested files:
 - `lib/draft-market/upside.ts`
 - `lib/draft-market/capital.ts`
 - `lib/draft-market/value-bands.ts`
+- `lib/draft-market/pick-grades.ts`
+- `lib/draft-market/ticker.ts`
+- `lib/draft-market/queue.ts`
+- `lib/draft-market/run-alerts.ts`
+- `lib/draft-market/value-grades.ts`
 - `lib/draft-market/recommend.ts`
 - `app/api/gm/draft-room/route.ts`
 - `app/api/gm/draft-room/pick/route.ts`
+- `app/api/gm/draft-room/queue/route.ts`
+- `app/api/gm/draft-room/alerts/route.ts`
 - `app/api/gm/simulator/route.ts`
 - `app/api/gm/simulator/autopick/route.ts`
 - `app/api/gm/recommendations/route.ts`
@@ -809,14 +949,18 @@ Minimum viable behavior:
 5. Support undo for the latest pick.
 6. Add simulator mode where computer teams draft automatically.
 7. Support auto-pick until the user's next pick.
-8. Compute the user's next pick.
-9. Score all available players.
-10. Calculate VORP, VOLS, VONA, and smoothed snake value.
-11. Estimate survival probability using ADP-centered simulation.
-12. Apply platform edge and source reliability weighting.
-13. Classify players into High Steal, Low Steal, Most Likely, Low Reach, and High Reach bands.
-14. Return top 5 recommendations as JSON.
-15. Include reason codes and component scores.
+8. Add available/selected board toggle.
+9. Add pick ticker tape.
+10. Add player queue with red/yellow/green dots.
+11. Add position-run alerts.
+12. Compute the user's next pick.
+13. Score all available players.
+14. Calculate VORP, VOLS, VONA, and smoothed snake value.
+15. Estimate survival probability using ADP-centered simulation.
+16. Apply platform edge and source reliability weighting.
+17. Classify players into seven bands: High Steal, Mid Steal, Low Steal, Expected, Low Reach, Mid Reach, High Reach.
+18. Return recommendations as JSON.
+19. Include reason codes and component scores.
 
 Do not add AI explanation until this JSON is stable.
 
@@ -840,6 +984,55 @@ Coach validation:
 - Did waiver recommendations produce lineup value?
 - Did "no move needed" weeks avoid unnecessary churn?
 - Did boom recommendations actually improve ceiling outcomes?
+
+### Workbook / Python Validation Track
+
+949Fantasy should maintain a Python validation workflow for historical and user-supplied workbook data.
+
+Purpose:
+
+- Test whether floor/ceiling formulas hit the target accuracy.
+- Compare last-season, projected, and career value grades.
+- Identify players whose projected ranges missed badly.
+- Separate normal model misses from injury-driven misses where possible.
+- Validate tier 1-3 benchmark logic for QB, RB, and WR.
+- Improve trust before exposing proprietary scoring as premium.
+
+Target:
+
+- Floor/ceiling range should land around 70% overall accuracy each season after reasonable injury filters.
+- Track both season-level and week-level hit rates.
+
+Suggested Python modules:
+
+- `scripts/model-validation/load_workbook.py`
+- `scripts/model-validation/normalize_players.py`
+- `scripts/model-validation/value_grades.py`
+- `scripts/model-validation/floor_ceiling_hit_rate.py`
+- `scripts/model-validation/projection_error.py`
+- `scripts/model-validation/report.py`
+
+Workbook inputs expected later:
+
+- Actual player points.
+- Position group averages.
+- Tier 1-3 players for QB, RB, WR.
+- Weekly projections.
+- Weekly actuals.
+- Floor.
+- Ceiling.
+- Injury/missed-game indicators if available.
+
+Validation outputs:
+
+- Overall hit rate.
+- Position hit rate.
+- Player hit rate.
+- Week-by-week error.
+- Season-total error.
+- Worst misses.
+- Injury-filtered accuracy.
+- Recommended formula adjustments.
 
 ## AI Boundary
 
@@ -880,8 +1073,12 @@ Then it should explain the returned data.
 - Draft simulator mode against computer teams.
 - Click-to-draft player assignment by snake pick order.
 - Auto-pick until user's next pick.
+- Available/selected board toggle.
+- Pick ticker tape.
+- Queue dots.
+- Position-run alerts.
 - Position filters: All, QB, RB, WR, TE, FLEX, DST, K.
-- Left-rail value bands: High Steal, Low Steal, Most Likely, Low Reach, High Reach.
+- Left-rail value bands: High Steal, Mid Steal, Low Steal, Expected, Low Reach, Mid Reach, High Reach.
 - Sleeper draft import only where easily available.
 - Platform-aware ADP/rank source fields.
 - Top 5 recommendations.

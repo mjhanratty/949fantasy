@@ -529,6 +529,89 @@ Data route:
 
 - `GET /api/gm/draft-room/:draftRoomId/recommendations`
 
+### GM Ticker Tape
+
+Needs:
+
+- Live list of picks.
+- Pick number, round, team slot, player, position, NFL team.
+- Draft grade.
+- Value band.
+- Reason codes.
+
+Data route:
+
+- `GET /api/gm/draft-room/:draftRoomId/ticker`
+
+### GM Available / Selected Board Toggle
+
+Needs:
+
+- Available board view.
+- Selected board view.
+- Selected board shows teams/rounds/picks as drafted.
+- Available board shows draftable remaining players with filters.
+
+State:
+
+- `boardMode: "available" | "selected"`
+
+### GM Queue
+
+Needs:
+
+- Add/remove queued players.
+- Queue order.
+- Red/yellow/green status dots.
+- Survival probability to next pick.
+- Reason codes for status change.
+
+Data routes:
+
+- `GET /api/gm/draft-room/:draftRoomId/queue`
+- `POST /api/gm/draft-room/:draftRoomId/queue`
+- `DELETE /api/gm/draft-room/:draftRoomId/queue/:playerId`
+
+### GM Position Run Alerts
+
+Needs:
+
+- Detect runs by position.
+- Show alert when run is material.
+- Dismiss alert.
+- Focus alert to change left rail filter to that position.
+
+Data routes:
+
+- `GET /api/gm/draft-room/:draftRoomId/alerts`
+- `POST /api/gm/draft-room/:draftRoomId/alerts/:alertId/dismiss`
+
+### GM Value Grades
+
+Needs:
+
+- Last Season Grade.
+- Projected Grade.
+- Career Grade.
+- Value formula:
+
+```txt
+player_value = player_points / position_group_average_points
+```
+
+Grade mapping:
+
+- `A+`: above `1.00`.
+- `A`: `0.90` to `1.00`.
+- `B`: `0.80` to `0.89`.
+- `C`: `0.70` to `0.79`.
+- `D`: `0.60` to `0.69`.
+- `F`: anything below `0.60`.
+
+Data route:
+
+- `GET /api/players/:playerId/value-grades`
+
 ### Draft Simulator
 
 Needs:
@@ -538,6 +621,9 @@ Needs:
 - Computer behavior presets.
 - Auto-pick until user's next pick.
 - Final roster grade.
+- Controlled randomness so simulations do not draft the same way every time.
+- Mix of reaches, steals, expected picks, and position runs.
+- Fast repeated simulations for strategy testing, in the spirit of tools like FantasyPros Draft Wizard / Mock Draft Simulator.
 
 Data routes:
 

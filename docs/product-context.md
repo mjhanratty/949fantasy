@@ -29,9 +29,9 @@ Base path: `/Users/matthewhanratty/Documents/New project/`
 
 **Global:** franchise/team selector + setup questionnaire; data modes: `connected_league` · `manual_draft_room` · `manual_user_roster` · `demo_or_empty`; tier 1–3 benchmark fallback when league/opponent data missing.
 
-**Draft tab** (new): Draft Rankings · Draft Board · Draft Score · GM · Simulator — see handoff § Draft Tab Piping.
+**Draft tab:** Rankings · Board · Score · GM · Simulator — [cursor-piping-handoff](./cursor-piping-handoff.md) § Draft Tab.
 
-**GM sidebar bands (7):** High Steal · Mid Steal · Low Steal · Expected · Low Reach · Mid Reach · High Reach.
+**GM (expanded):** 7 value bands · ticker tape · available/selected board toggle · draft queue (R/Y/G + survival) · position-run alerts · player value grades (A+–F) · simulator with behavioral randomness.
 
 **Coach** (advisory only — no lineup/transaction automation): Insights button, Q&A (`POST /api/coach/insight`, `POST /api/coach/question`), scenario templates (Highest Ceiling, Best Boom, Safest Bet, Best Floor, Need Upside, Protect Lead), usage-trend watch/drop, waiver language gated on league availability ([page-content-spec](./page-content-spec.md) § Coach).
 

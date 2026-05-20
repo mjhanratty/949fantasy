@@ -1,6 +1,6 @@
 # 949Fantasy Draft Theory Source Notes
 
-> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md` — feeds `draft_theory_lessons` and [draft-market-engine.md](./draft-market-engine.md).
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md`
 
 ## Purpose
 
@@ -26,6 +26,7 @@ Some pages were fully accessible through browser fetch. Some were only available
 | RotoWire auction values | Full | Custom league settings, auction value calculation, budget discipline |
 | Fantasy Footballers strategic nominations | Full | Auction nomination tactics and opponent-budget pressure |
 | FantasyPros position scarcity | Search-indexed full excerpt | Scarcity as drop-off by ADP tiers |
+| FantasyPros Draft Wizard / Mock Draft Simulator | Search-indexed excerpts | Custom settings, computer opponent logic, repeated strategy testing, instant draft analysis |
 | FanGraphs BPA vs scarcity | Search excerpt only | BPA and scarcity should not be separate if value is position-adjusted |
 | FFInsights QB strategy | Search-indexed full excerpt | Projection vs ADP validation and QB breakout signals |
 | SMU data science paper | Failed fetch | Verify manually later |
@@ -412,6 +413,34 @@ GM engine implication:
 - In auction mode, recommend nomination targets based on opponent budgets, roster gaps, and price-inflation potential.
 - In snake mode, track opponent roster construction to predict future positional demand.
 - Do not recommend nominating desired sleepers early unless the user's max bid protection is strong.
+
+### 16. Draft Simulation Should Be Fast, Customizable, And Variable
+
+Sources:
+
+- FantasyPros Mock Draft / Draft Wizard search excerpts.
+
+Lesson:
+
+The simulator should let users practice from their exact league context: league size, draft slot, roster settings, scoring, and platform assumptions. It should allow repeated mocks because users are testing strategy, not just one static expected draft.
+
+GM engine implication:
+
+- Use the user's actual league settings.
+- Make simulator picks quickly.
+- Include computer opponent logic.
+- Return instant draft analysis.
+- Add randomness and behavior presets so simulations do not become predictable.
+- Track repeated simulations to show players who frequently do or do not make it back.
+
+Simulator should include a mix of:
+
+- Expected picks.
+- Reaches.
+- Steals.
+- Position runs.
+- Roster-need picks.
+- Platform-rank picks.
 
 ## GM Agent Rules Derived From Sources
 

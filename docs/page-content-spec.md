@@ -620,9 +620,11 @@ This page should allow comparison across positions, not just within the same pos
 
 ## GM
 
-GM is the live draft-day decision tool.
+GM is the live draft-day nudge system.
 
 V1 should be manual-first. The user mirrors their real draft by clicking players as they are selected. This lets 949Fantasy deliver a useful draft room without waiting for ESPN, Yahoo, or other platform APIs.
+
+GM should be less conversational than Coach. It should mostly provide silent, live draft context through the board, ticker tape, left sidebar, queue indicators, and alerts. User-prompted questions can exist later, but V1 should rely on the board and nudges to answer most draft questions.
 
 Core setup inputs:
 
@@ -636,12 +638,18 @@ Core setup inputs:
 
 Core draft room content:
 
+- Live/Simulator mode switch.
 - Current pick.
 - User's next pick.
 - Drafted players.
 - User roster.
+- Opponent team rosters.
+- Top ticker tape.
 - Draft-position value column.
 - Interactive draft board.
+- Available / Selected board toggle.
+- Player queue.
+- Position run alerts.
 - Draft simulator mode.
 - Top 5 recommended picks.
 - Survival probability to next user pick.
@@ -657,16 +665,20 @@ The left side of the GM screen should show the user's current draft position val
 Bands:
 
 - High Steal.
+- Mid Steal.
 - Low Steal.
-- Most Likely.
+- Expected.
 - Low Reach.
+- Mid Reach.
 - High Reach.
 
 Purpose:
 
-- Translate the current draft board into a fast decision range.
+- Translate the current draft board into a fast seven-option decision range.
 - Show where available players sit relative to the user's pick capital.
 - Update immediately as players are marked drafted.
+- Change when the user filters by position.
+- Change when a position run alert is focused.
 
 Each band should include:
 
@@ -682,10 +694,43 @@ Each band should include:
 Band interpretation:
 
 - High Steal: available players who should usually have been selected earlier by 949 value and current pick capital.
-- Low Steal: players modestly above current pick value.
-- Most Likely: players fairly priced for the current draft slot.
+- Mid Steal: strong value above current pick expectation.
+- Low Steal: modest value above current pick expectation.
+- Expected: central pick based on best available value at the user's selection position.
 - Low Reach: players slightly expensive but defensible based on roster need, scarcity, or upside.
-- High Reach: players materially expensive at the current pick and generally discouraged unless the user has a specific strategy.
+- Mid Reach: players expensive but viable when chasing upside, roster construction, or a tier cliff.
+- High Reach: sleeper/upside candidates with higher ceiling and lower floor. This should be explained as a calculated range play, not simply a bad pick.
+
+The central `Expected` player should always represent the best available expected pick based on the user's current pick capital and active filter. The three options above are steals. The three options below are potential reaches/sleepers.
+
+Reach language rule:
+
+- In GM, "Reach" must be defined for users as paying ahead of market for upside, roster fit, or scarcity.
+- Reaches are not automatically bad picks.
+- High Reach often means high-ceiling, lower-floor, range-heavy players.
+- The UI should explain this before or during draft setup.
+
+### GM Ticker Tape
+
+The top of the draft board should include a live ticker tape of selections.
+
+Each pick ticker item should show:
+
+- Pick number.
+- Round.
+- Team slot/team name.
+- Player name.
+- Position.
+- NFL team.
+- Draft grade.
+- Band: High Steal, Mid Steal, Low Steal, Expected, Low Reach, Mid Reach, High Reach.
+
+Ticker behavior:
+
+- Updates after every live click or simulator pick.
+- Uses GM's current understanding of draft capital, available players, team needs, player projection, ADP, and platform rank.
+- Lets the user understand how their draft and opponent drafts are unfolding without opening a chat.
+- Can include compact badges for position runs, tier cliffs, or major value falls.
 
 ### GM Interactive Draft Board
 
@@ -714,6 +759,13 @@ Round 3: 1,2,3,4,5,6,7,8,9,10
 ```
 
 If the user drafts 5th, GM knows every pick where `team_slot = 5` belongs to the user's team.
+
+Board mode toggle:
+
+- Available: shows remaining available draft pool.
+- Selected: shows the draft grid filled with selected players by team/round.
+
+The user should be able to visually inspect how the draft is going, not only who remains available.
 
 ### GM Draft Simulator
 
@@ -751,6 +803,8 @@ Simulator behavior:
 - User can draft any available player, not only the recommendation.
 - The simulator continues until the draft is complete or the user exits.
 - At the end, GM produces a draft recap and roster grade.
+- Computer teams should not draft identically every simulation.
+- Computer teams should mix expected picks, reaches, and steals so the draft feels realistic.
 
 Simulator controls:
 
@@ -759,6 +813,7 @@ Simulator controls:
 - Auto-pick until my next pick.
 - Undo last pick.
 - Restart draft.
+- Complete wipe.
 - Save draft result.
 
 Simulator outputs:
@@ -773,6 +828,93 @@ Simulator outputs:
 - Players repeatedly unavailable by the user's next pick across simulations.
 
 Draft simulator should reuse the same interactive board layout. The difference is that computer picks are filled automatically instead of requiring the user to mirror a real draft.
+
+### GM Queue
+
+The right side of the GM screen should support a player queue.
+
+Purpose:
+
+- Let the user track preferred targets.
+- Show how target value changes as the draft unfolds.
+- Help users react when queued players become more urgent or less valuable.
+
+Queue indicators:
+
+- Green dot: target is gaining value or remains strong for the user's next pick.
+- Yellow dot: target is becoming uncertain or may not make it back.
+- Red dot: target is likely to be gone soon, is now overpriced, or no longer fits the roster build.
+
+Queue signals should react to:
+
+- Player survival probability.
+- Position runs.
+- Tier cliffs.
+- User roster construction.
+- Picks made by teams drafting before the user.
+- Platform rank and ADP.
+
+### GM Position Run Alerts
+
+GM should alert the user when a position run is happening.
+
+Example:
+
+- In Round 3, four WRs are selected in a short pick window.
+- GM surfaces a pop-up or ticker alert: `WR run detected`.
+- User can dismiss the alert.
+- User can focus the alert, which automatically changes the left rail filter to WR.
+
+Run alert inputs:
+
+- Number of same-position picks in recent pick window.
+- Draft round.
+- Remaining tier depth.
+- User roster need.
+- Upcoming pick gap.
+
+Run alert output:
+
+- Position.
+- Severity.
+- Picks involved.
+- Remaining tier count.
+- Suggested focus action.
+
+### GM Value Grades
+
+949 draft grades should be rooted in value points.
+
+Core value formula:
+
+```txt
+player_value = player_points / position_group_average_points
+```
+
+Example:
+
+```txt
+Lamar Jackson projected points = 350
+QB average projected points = 285
+value = 350 / 285 = 1.23
+```
+
+Grade bands:
+
+- `A+`: above `1.00`.
+- `A`: `0.90` to `1.00`.
+- `B`: `0.80` to `0.89`.
+- `C`: `0.70` to `0.79`.
+- `D`: `0.60` to `0.69`.
+- `F`: anything below `0.60`.
+
+Show three grades where available:
+
+- Last Season Grade.
+- Projected Grade.
+- Career Grade.
+
+GM should use these grades to introduce 949's value-point draft theory and help users chase as many A/A+ outcomes as possible within ADP and draft-position constraints.
 
 Position filters:
 
