@@ -2,6 +2,7 @@
 
 **Screen detail:** [page-content-spec.md](./page-content-spec.md)  
 **API / data wiring:** [cursor-piping-handoff.md](./cursor-piping-handoff.md)  
+**Data sources (V0–V2):** [data-source-matrix.md](./data-source-matrix.md)  
 **Draft engine:** [draft-market-engine.md](./draft-market-engine.md)
 
 ## Authenticated shell

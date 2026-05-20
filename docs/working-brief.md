@@ -1,5 +1,7 @@
 # 949Fantasy Working Brief
 
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-working-brief.md`
+
 ## Role Split
 
 - Codex: product logic, data model, ranking methodology, implementation requirements, QA criteria, and build handoff notes.
@@ -30,6 +32,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-draft-market-engine.md`: GM and Coach market-engine architecture, draft theory knowledge base, scoring pipeline, simulations, and AI boundaries.
 - `949fantasy-draft-theory-source-notes.md`: article/research-derived draft theory notes used to ground the GM engine.
 - `949fantasy-cursor-piping-handoff.md`: Cursor-facing data/API piping instructions for current pages, GM/Coach, fallbacks, and Vercel connections.
+- `949fantasy-data-source-matrix.md`: full data source table for supporting Claude-created views, Coach, GM, Draft, Analytics, and Vercel integration planning.
 
 ## Current HTML View Inventory
 

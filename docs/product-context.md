@@ -11,6 +11,7 @@ Authoritative product, metrics, and engineering briefs live **outside this repo*
 | Metrics glossary | `…/949fantasy-metrics-glossary.md` | — (external) |
 | Draft market engine | `…/949fantasy-draft-market-engine.md` | [draft-market-engine.md](./draft-market-engine.md) |
 | Draft theory source notes | `…/949fantasy-draft-theory-source-notes.md` | [draft-theory-source-notes.md](./draft-theory-source-notes.md) |
+| **Data source matrix** | `…/949fantasy-data-source-matrix.md` | [data-source-matrix.md](./data-source-matrix.md) |
 
 Base path: `/Users/matthewhanratty/Documents/New project/`
 
@@ -38,9 +39,17 @@ Base path: `/Users/matthewhanratty/Documents/New project/`
 
 Full route list and TypeScript shapes: [cursor-piping-handoff.md](./cursor-piping-handoff.md).
 
+## Data sources (matrix)
+
+V0/V1/V2 priority table: external providers vs **949 internal** tables (Supabase), view coverage, Vercel build phases. Includes **manual weekly roster refresh (V1.1)** for post-draft Coach without full league sync.
+
+See [data-source-matrix.md](./data-source-matrix.md).
+
 ## Related specs
 
 - Screens / GM UI: [page-content-spec.md](./page-content-spec.md)
+- API wiring: [cursor-piping-handoff.md](./cursor-piping-handoff.md)
+- Data sources: [data-source-matrix.md](./data-source-matrix.md)
 - Engine math: [draft-market-engine.md](./draft-market-engine.md)
 - Routes map: [ia-routes.md](./ia-routes.md)
 - Prototype source: [design-reference.md](./design-reference.md) → `prototype/src/`
@@ -54,4 +63,5 @@ cp "/Users/matthewhanratty/Documents/New project/949fantasy-v1-stack.md" docs/v1
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-page-content-spec.md" docs/page-content-spec.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md" docs/draft-market-engine.md
 cp "/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md" docs/draft-theory-source-notes.md
+cp "/Users/matthewhanratty/Documents/New project/949fantasy-data-source-matrix.md" docs/data-source-matrix.md
 ```
