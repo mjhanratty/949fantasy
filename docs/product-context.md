@@ -15,7 +15,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [draft-market-engine.md](./draft-market-engine.md) | GM/Coach engine |
 | [draft-theory-source-notes.md](./draft-theory-source-notes.md) | Draft research → lessons |
 | [ia-routes.md](./ia-routes.md) | Routes |
-| [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) | V0 RapidAPI scaffold, `.env.local` blocker, test flow |
+| [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) | V0 RapidAPI, `/data-lab`, prototype `:3456` → `:3000` teams hydration |
 | [design-reference.md](./design-reference.md) | `prototype/` shell |
 
 ## Environment & hosting
@@ -23,7 +23,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 - **Production:** https://949fantasy.vercel.app — env vars in Vercel **Production** and **Preview** only.
 - **Local dev:** copy non-secrets from [vercel-env-plan.md](./vercel-env-plan.md) into **`.env.local`** (gitignored). Do **not** use Vercel Development env (blocked in current project flow).
 - **Supabase:** project `vnubuviqqenumpmeitsq` — `DATABASE_URL` = transaction pooler (port **6543**), server-only.
-- **V0 data:** `DATA_MODE=v0_rapidapi_manual`, RapidAPI NFL API Data + Sleeper public API + manual platform rankings.
+- **V0 data:** `DATA_MODE=v0_rapidapi_manual`, RapidAPI NFL API Data + Sleeper public API + manual platform rankings. Prototype hydrates `TEAMS` from `GET /api/nfl/teams` when Next is running on `:3000`.
 
 ## Who does what
 

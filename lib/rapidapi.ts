@@ -6,6 +6,8 @@ export type NormalizedNflTeam = {
   displayName: string;
   conference?: string;
   division?: string;
+  color?: string;
+  alternateColor?: string;
   raw: unknown;
 };
 
@@ -59,16 +61,25 @@ function getTeamArray(payload: unknown): RapidApiTeamRecord[] {
 
 export function normalizeNflTeams(payload: unknown): NormalizedNflTeam[] {
   return getTeamArray(payload).map((team, index) => {
+    const teamRecord =
+      typeof team.team === "object" && team.team !== null
+        ? (team.team as RapidApiTeamRecord)
+        : team;
     const id =
-      readString(team, ["teamId", "id", "TeamID", "team_id", "key", "slug"]) ??
+      readString(teamRecord, ["teamId", "id", "TeamID", "team_id", "key", "slug"]) ??
       `team-${index + 1}`;
-    const name = readString(team, ["name", "teamName", "displayName", "Name", "nickname"]) ?? "Unknown Team";
-    const abbreviation = readString(team, ["abbreviation", "abbr", "teamAbv", "Team", "key"]);
-    const city = readString(team, ["city", "location", "market", "City"]);
-    const conference = readString(team, ["conference", "Conference"]);
-    const division = readString(team, ["division", "Division"]);
+    const abbreviation = readString(teamRecord, ["abbreviation", "abbr", "teamAbv", "Team", "key"]);
+    const displayNameFromProvider = readString(teamRecord, ["displayName", "fullName", "teamDisplayName"]);
+    const shortName = readString(teamRecord, ["shortDisplayName", "nickname", "name", "teamName", "Name"]);
+    const location = readString(teamRecord, ["location", "city", "market", "City"]);
+    const name = shortName ?? displayNameFromProvider ?? abbreviation ?? "Unknown Team";
+    const city = location;
+    const conference = readString(teamRecord, ["conference", "Conference"]);
+    const division = readString(teamRecord, ["division", "Division"]);
+    const color = readString(teamRecord, ["color"]);
+    const alternateColor = readString(teamRecord, ["alternateColor"]);
     const displayName =
-      readString(team, ["displayName", "fullName", "teamDisplayName"]) ??
+      displayNameFromProvider ??
       [city, name].filter(Boolean).join(" ") ??
       name;
 
@@ -80,6 +91,8 @@ export function normalizeNflTeams(payload: unknown): NormalizedNflTeam[] {
       displayName,
       conference,
       division,
+      color: color ? `#${color.replace(/^#/, "")}` : undefined,
+      alternateColor: alternateColor ? `#${alternateColor.replace(/^#/, "")}` : undefined,
       raw: team,
     };
   });

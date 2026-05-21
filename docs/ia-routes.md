@@ -29,7 +29,7 @@ Tier 1–3 positional benchmark when league/opponent data unavailable.
 | Surface | Route | Notes |
 |---------|-------|--------|
 | Data lab | `/data-lab` | RapidAPI teams test UI — [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) |
-| NFL teams proxy | `GET /api/nfl/teams` | Server-only RapidAPI; CORS for `http://localhost:3456` prototype |
+| NFL teams proxy | `GET /api/nfl/teams` | Server-only RapidAPI; CORS for `http://localhost:3456`; prototype hydrates `TEAMS` on load |
 
 ## Next.js routes (target)
 

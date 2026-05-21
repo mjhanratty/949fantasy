@@ -23,6 +23,75 @@ const TEAMS = {
   SEA: { name: "Seattle",    color: "#002244" },
 };
 
+const NFL_DATA_ENDPOINT = "http://127.0.0.1:3000/api/nfl/teams";
+
+function normalizePrototypeTeam(team) {
+  const abbreviation = team.abbreviation || team.id;
+  if (!abbreviation) return null;
+
+  return {
+    abbreviation,
+    name: team.city || team.name || team.displayName || abbreviation,
+    displayName: team.displayName || [team.city, team.name].filter(Boolean).join(" ") || abbreviation,
+    conference: team.conference,
+    division: team.division,
+  };
+}
+
+async function hydrateNflTeamsFromApi() {
+  window.NFL_DATA_STATUS = {
+    status: "loading",
+    source: "rapidapi_nfl_api_data",
+    message: "Loading NFL team data",
+    teamsLoaded: 0,
+    updatedAt: null,
+  };
+  window.dispatchEvent(new CustomEvent("nfl-data-status", { detail: window.NFL_DATA_STATUS }));
+
+  try {
+    const response = await fetch(NFL_DATA_ENDPOINT);
+    const payload = await response.json();
+
+    if (!payload.ok) {
+      throw new Error(payload.error || "NFL data request failed");
+    }
+
+    const liveTeams = {};
+    (payload.teams || []).forEach(team => {
+      const normalized = normalizePrototypeTeam(team);
+      if (!normalized) return;
+
+      liveTeams[normalized.abbreviation] = {
+        ...(TEAMS[normalized.abbreviation] || {}),
+        name: normalized.name,
+        displayName: normalized.displayName,
+        conference: normalized.conference,
+        division: normalized.division,
+      };
+    });
+
+    Object.assign(TEAMS, liveTeams);
+
+    window.NFL_DATA_STATUS = {
+      status: "live",
+      source: payload.provider || "rapidapi_nfl_api_data",
+      message: "Live NFL teams loaded",
+      teamsLoaded: Object.keys(liveTeams).length,
+      updatedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    window.NFL_DATA_STATUS = {
+      status: "mock",
+      source: "prototype_mock",
+      message: error instanceof Error ? error.message : "Using prototype mock data",
+      teamsLoaded: 0,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  window.dispatchEvent(new CustomEvent("nfl-data-status", { detail: window.NFL_DATA_STATUS }));
+}
+
 function traj(seed, base, vol, trend = 0) {
   const out = [];
   let v = base;
@@ -147,77 +216,39 @@ const NEWS = [
 
 // NFL cities for the Games map (Image 10)
 // Coords are in the user-provided SVG's space: viewBox 0 0 2000 1200
-// Lat/lng from stadium CSV → projected to SVG viewBox 2000×1200
 const NFL_CITIES = [
-  { team: "ARI", city: "Glendale", indoor: true, x: 551, y: 749 },
-  { team: "ATL", city: "Atlanta", indoor: true, x: 1601, y: 739 },
-  { team: "BAL", city: "Baltimore", indoor: true, x: 1894, y: 500 },
-  { team: "BUF", city: "Orchard Park", indoor: true, x: 1813, y: 348 },
-  { team: "CAR", city: "Charlotte", indoor: true, x: 1735, y: 676 },
-  { team: "CHI", city: "Chicago", indoor: false, x: 1480, y: 388 },
-  { team: "CIN", city: "Cincinnati", indoor: false, x: 1597, y: 508 },
-  { team: "CLE", city: "Cleveland", indoor: false, x: 1703, y: 403 },
-  { team: "DAL", city: "Arlington", indoor: true, x: 1123, y: 783 },
-  { team: "DEN", city: "Denver", indoor: true, x: 824, y: 480 },
-  { team: "DET", city: "Detroit", indoor: true, x: 1652, y: 367 },
-  { team: "GB", city: "Green Bay", indoor: false, x: 1463, y: 274 },
-  { team: "HOU", city: "Houston", indoor: true, x: 1186, y: 916 },
-  { team: "IND", city: "Indianapolis", indoor: true, x: 1535, y: 479 },
-  { team: "JAX", city: "Jacksonville", indoor: false, x: 1705, y: 888 },
-  { team: "KC", city: "Kansas City", indoor: false, x: 1221, y: 510 },
-  { team: "LAC", city: "San Diego", indoor: false, x: 368, y: 781 },
-  { team: "LAR", city: "St. Louis", indoor: false, x: 1383, y: 528 },
-  { team: "LV", city: "Las Vegas", indoor: true, x: 177, y: 566 },
-  { team: "MIA", city: "Miami Gardens", indoor: false, x: 1758, y: 1077 },
-  { team: "MIN", city: "Minneapolis", indoor: true, x: 1267, y: 253 },
-  { team: "NE", city: "Foxborough", indoor: false, x: 1910, y: 378 },
-  { team: "NO", city: "New Orleans", indoor: true, x: 1387, y: 904 },
-  { team: "NYG", city: "East Rutherford", indoor: false, x: 1910, y: 433 },
-  { team: "NYJ", city: "East Rutherford", indoor: false, x: 1910, y: 433 },
-  { team: "PHI", city: "Philadelphia", indoor: false, x: 1910, y: 473 },
-  { team: "PIT", city: "Pittsburgh", indoor: false, x: 1766, y: 449 },
-  { team: "SEA", city: "Seattle", indoor: false, x: 172, y: 140 },
-  { team: "SF", city: "Santa Clara", indoor: false, x: 170, y: 568 },
-  { team: "TB", city: "Tampa", indoor: true, x: 1672, y: 990 },
-  { team: "TEN", city: "Nashville", indoor: true, x: 1512, y: 635 },
-  { team: "WAS", city: "Landover", indoor: false, x: 1885, y: 516 },
+  { team: "BUF", city: "Buffalo",       indoor: false, x: 1660, y: 310  },
+  { team: "NE",  city: "Foxborough",    indoor: false, x: 1830, y: 340  },
+  { team: "NYJ", city: "E. Rutherford", indoor: false, x: 1760, y: 420  },
+  { team: "PHI", city: "Philadelphia",  indoor: false, x: 1680, y: 440  },
+  { team: "WAS", city: "Landover",      indoor: false, x: 1640, y: 470  },
+  { team: "BAL", city: "Baltimore",     indoor: false, x: 1660, y: 460  },
+  { team: "PIT", city: "Pittsburgh",    indoor: false, x: 1550, y: 430  },
+  { team: "CLE", city: "Cleveland",     indoor: false, x: 1500, y: 390  },
+  { team: "CIN", city: "Cincinnati",    indoor: false, x: 1440, y: 480  },
+  { team: "IND", city: "Indianapolis",  indoor: true,  x: 1380, y: 470  },
+  { team: "DET", city: "Detroit",       indoor: true,  x: 1440, y: 340  },
+  { team: "GB",  city: "Green Bay",     indoor: false, x: 1290, y: 280  },
+  { team: "CHI", city: "Chicago",       indoor: false, x: 1320, y: 400  },
+  { team: "MIN", city: "Minneapolis",   indoor: true,  x: 1170, y: 290  },
+  { team: "KC",  city: "Kansas City",   indoor: false, x: 1140, y: 540  },
+  { team: "TEN", city: "Nashville",     indoor: false, x: 1380, y: 590  },
+  { team: "DAL", city: "Dallas",        indoor: true,  x: 1040, y: 810  },
+  { team: "HOU", city: "Houston",       indoor: true,  x: 1090, y: 940  },
+  { team: "NO",  city: "New Orleans",   indoor: true,  x: 1250, y: 940  },
+  { team: "ATL", city: "Atlanta",       indoor: true,  x: 1450, y: 740  },
+  { team: "CAR", city: "Charlotte",     indoor: false, x: 1550, y: 650  },
+  { team: "JAX", city: "Jacksonville",  indoor: false, x: 1570, y: 890  },
+  { team: "MIA", city: "Miami",         indoor: false, x: 1710, y: 1110 },
+  { team: "TB",  city: "Tampa",         indoor: false, x: 1610, y: 980  },
+  { team: "DEN", city: "Denver",        indoor: false, x: 740,  y: 540  },
+  { team: "LV",  city: "Las Vegas",     indoor: true,  x: 410,  y: 640  },
+  { team: "LAR", city: "Inglewood",     indoor: true,  x: 330,  y: 690  },
+  { team: "LAC", city: "Inglewood",     indoor: true,  x: 350,  y: 710  },
+  { team: "SF",  city: "Santa Clara",   indoor: false, x: 190,  y: 570  },
+  { team: "SEA", city: "Seattle",       indoor: false, x: 400,  y: 180  },
+  { team: "ARI", city: "Glendale",      indoor: true,  x: 560,  y: 720  },
 ];
-
-// Week 11 home club at shared venues (MetLife / LAC–LAR)
-const WEEK11_HOME_AT_SHARED = { NYG: "NYJ", NYJ: "NYJ", LAC: "LAR", LAR: "LAR" };
-
-const SHARED_STADIUM_GROUPS = [{ teams: ["NYG", "NYJ"] }, { teams: ["LAC", "LAR"] }];
-
-function mapSiteForTeam(team, homeOverrides = WEEK11_HOME_AT_SHARED) {
-  const group = SHARED_STADIUM_GROUPS.find((g) => g.teams.includes(team));
-  if (!group) {
-    const site = NFL_CITIES.find((c) => c.team === team);
-    return { ...site, displayTeam: team };
-  }
-  const home = homeOverrides[team] ?? team;
-  const site = NFL_CITIES.find((c) => c.team === home);
-  return { ...site, displayTeam: home };
-}
-
-function buildMapMarkers(weekStatus, homeOverrides = WEEK11_HOME_AT_SHARED) {
-  const statusRank = { you: 4, opp: 3, neutral: 2, off: 1 };
-  const byKey = {};
-  NFL_CITIES.forEach((city) => {
-    const site = mapSiteForTeam(city.team, homeOverrides);
-    const key = site.x + "," + site.y;
-    const status = weekStatus[city.team] || "off";
-    if (!byKey[key]) {
-      byKey[key] = { ...site, team: site.displayTeam, teamsAtSite: [city.team], _status: status };
-      return;
-    }
-    byKey[key].teamsAtSite.push(city.team);
-    if ((statusRank[status] || 0) > (statusRank[byKey[key]._status] || 0)) byKey[key]._status = status;
-    if (homeOverrides[city.team] === city.team || city.team === site.displayTeam) {
-      byKey[key].team = site.displayTeam;
-    }
-  });
-  return Object.values(byKey).map(({ _status, ...m }) => m);
-}
 
 // Per-week active locations for current week — used to color city dots
 // "you" = your player there, "opp" = opponent's player there, "neutral" = a game but neither, "off" = bye
@@ -231,14 +262,13 @@ const WEEK11_GAMES = {
   ARI: "off", WAS: "off",
 };
 
-const NFL_MAP_MARKERS = buildMapMarkers(WEEK11_GAMES, WEEK11_HOME_AT_SHARED);
-
 Object.assign(window, {
   TEAMS, PLAYERS, NEWS,
   ROSTER_IDS, STARTER_IDS, BENCH_IDS, LEAGUE_SLOTS,
   TEAM_POSITION_WEEKS, TEAM_FUTURE_WEEKS,
   POSITION_PERFORMANCE, LEAGUE_POS_AVG, LEAGUE_STANDINGS,
-  NFL_CITIES, WEEK11_GAMES, WEEK11_HOME_AT_SHARED, NFL_MAP_MARKERS, buildMapMarkers, mapSiteForTeam,
+  NFL_CITIES, WEEK11_GAMES,
+  NFL_DATA_ENDPOINT, hydrateNflTeamsFromApi,
 });
 
 // ============================================================

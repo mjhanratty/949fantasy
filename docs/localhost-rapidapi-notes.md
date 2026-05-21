@@ -14,10 +14,25 @@ Local app URL:
 http://127.0.0.1:3000
 ```
 
-Implemented (this repo):
+Prototype URL:
 
-- Data lab page: `app/(dev)/data-lab/page.tsx` → http://127.0.0.1:3000/data-lab
-- Client test panel: `components/dev/nfl-data-test.tsx`
+```text
+http://localhost:3456
+```
+
+Implemented / restored:
+
+- Restored v2 prototype entry from `/Users/matthewhanratty/Downloads/949fantsyv2.html` to `prototype/index.html`.
+- Restored readable v2 prototype source from `/Users/matthewhanratty/Downloads/949Fantasy (2).zip` to `prototype/src/`.
+- Added prototype startup hydration in `prototype/src/data.jsx`:
+  - calls `http://127.0.0.1:3000/api/nfl/teams`
+  - merges normalized team metadata into the existing `TEAMS` object
+  - dispatches `nfl-data-status`
+  - falls back to prototype mock data when the API route is unavailable
+- Added v2 top-nav data badge in `prototype/src/app.jsx`:
+  - `NFL Loading`
+  - `NFL Live · {team count}`
+  - `NFL Mock`
 - Server-only RapidAPI route: `app/api/nfl/teams/route.ts`
 - RapidAPI fetch/normalization helper: `lib/rapidapi.ts`
 
@@ -26,8 +41,10 @@ Verified:
 - `npm install` completed.
 - `npm run typecheck` passed.
 - `npm run build` passed.
-- Home page returns HTTP 200 locally.
+- V2 prototype returns HTTP 200 locally at `http://localhost:3456`.
 - `/api/nfl/teams` is reachable locally.
+- `/api/nfl/teams` returns CORS headers for `http://localhost:3456`.
+- The v2 prototype no longer uses the temporary `Load Teams` button.
 
 ## Current Blocker
 
@@ -60,6 +77,8 @@ RAPIDAPI_NFL_API_KEY=your_actual_key_here
 
 Do not commit `.env.local`. It is already gitignored.
 
+After changing `.env.local`, restart the Next dev server. Next.js does not reliably reload new server env values without a restart.
+
 The non-secret local defaults are already present:
 
 ```bash
@@ -73,13 +92,19 @@ NEXT_PUBLIC_SUPABASE_URL=https://vnubuviqqenumpmeitsq.supabase.co
 
 After the local key is added:
 
-1. Start the app:
+1. Start the Next API server:
 
 ```bash
 npm run dev -- --hostname 127.0.0.1 --port 3000
 ```
 
-2. Test the API route:
+2. Start the v2 prototype:
+
+```bash
+npm run prototype
+```
+
+3. Test the API route:
 
 ```bash
 curl http://127.0.0.1:3000/api/nfl/teams
@@ -96,13 +121,19 @@ Expected shape:
 }
 ```
 
-3. Open the test page:
+4. Open the v2 prototype:
 
 ```text
-http://127.0.0.1:3000/data-lab
+http://localhost:3456
 ```
 
-4. Click `Load Teams`.
+5. Hard-refresh the browser if needed.
+
+Expected prototype result:
+
+```text
+NFL Live · {team count}
+```
 
 ## Implementation Notes
 
@@ -111,7 +142,7 @@ The browser never calls RapidAPI directly.
 Correct flow:
 
 ```text
-Browser -> /api/nfl/teams -> RapidAPI -> normalized team JSON -> Browser
+Prototype browser on :3456 -> Next API on :3000 -> RapidAPI -> normalized team JSON -> Prototype
 ```
 
 This keeps `RAPIDAPI_NFL_API_KEY` server-only.
