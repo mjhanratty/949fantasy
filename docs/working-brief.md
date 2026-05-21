@@ -1,7 +1,5 @@
 # 949Fantasy Working Brief
 
-> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-working-brief.md`
-
 ## Role Split
 
 - Codex: product logic, data model, ranking methodology, implementation requirements, QA criteria, and build handoff notes.
@@ -13,6 +11,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 ## Source Files
 
 - `/Users/matthewhanratty/Downloads/Fantasy Football V2.0.xlsx`
+- `/Users/matthewhanratty/Downloads/Fantasy Football V2.0 (1).xlsx`
 - `/Users/matthewhanratty/Downloads/949Fantasy Roadmap.docx`
 - `/Users/matthewhanratty/Downloads/949Fantasy.pptx`
 - `/Users/matthewhanratty/Downloads/949Fantasy` Figma/FigJam export bundle
@@ -34,6 +33,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-cursor-piping-handoff.md`: Cursor-facing data/API piping instructions for current pages, GM/Coach, fallbacks, and Vercel connections.
 - `949fantasy-data-source-matrix.md`: full data source table for supporting Claude-created views, Coach, GM, Draft, Analytics, and Vercel integration planning.
 - `949fantasy-vercel-env-plan.md`: prioritized Vercel environment variable plan for V0 testing, free NFL data, Supabase, Coach/GM, and V1 provider integrations.
+- `949fantasy-workbook-analysis-notes.md`: workbook-specific analysis of `Fantasy Rankings`, value grading, current floor/ceiling formulas, validation gaps, and production model requirements.
 
 ## Current HTML View Inventory
 

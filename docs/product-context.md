@@ -5,6 +5,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | Document | In-repo |
 |----------|---------|
 | [working-brief.md](./working-brief.md) | Mission, brand, handoff index |
+| [workbook-analysis-notes.md](./workbook-analysis-notes.md) | Excel `Fantasy Rankings` formulas, value grades, floor/ceiling audit, rookie model |
 | [v1-stack.md](./v1-stack.md) | Stack, Supabase, providers, schema |
 | [vercel-env-plan.md](./vercel-env-plan.md) | **Vercel + `.env.local`** priorities (V0 RapidAPI, feature flags, Supabase) |
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
@@ -36,7 +37,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 - **Franchise modes:** `connected_league` · `manual_draft_room` · `manual_user_roster` · `demo_or_empty`
 - **Draft / GM:** board, simulator, 7 bands, ticker, queue, alerts, value grades — see piping handoff + page spec
 - **Coach:** advisory only; Insights, scenarios, Q&A — no auto lineup submit
-- **Metrics:** [metrics-glossary.md](./metrics-glossary.md)
+- **Metrics / projections:** [metrics-glossary.md](./metrics-glossary.md); workbook lineage in [workbook-analysis-notes.md](./workbook-analysis-notes.md) (70% hit-rate target; current bands ~6–23% on audit)
 
 ## Sync vendored docs
 
