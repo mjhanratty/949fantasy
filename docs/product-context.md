@@ -43,7 +43,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
-for f in working-brief v1-stack vercel-env-plan page-content-spec cursor-piping-handoff \
+for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff \
   data-source-matrix metrics-glossary draft-market-engine draft-theory-source-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
