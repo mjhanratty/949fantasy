@@ -1,7 +1,7 @@
 # 949Fantasy Workbook Analysis Notes
 
-> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-workbook-analysis-notes.md`  
-> **Workbook:** `/Users/matthewhanratty/Downloads/Fantasy Football V2.0 (1).xlsx` — methodology inspiration, not production architecture.
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-workbook-analysis-notes.md`
+
 
 Source workbook: `/Users/matthewhanratty/Downloads/Fantasy Football V2.0 (1).xlsx`
 

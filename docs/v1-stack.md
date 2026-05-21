@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-v1-stack.md`
 
+
 ## Purpose
 
 This document is the implementation-facing stack brief for Cursor.

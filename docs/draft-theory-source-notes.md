@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-theory-source-notes.md`
 
+
 ## Purpose
 
 This document converts the provided draft strategy sources into structured product lessons for the 949Fantasy GM agent.

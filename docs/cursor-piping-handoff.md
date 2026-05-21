@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-cursor-piping-handoff.md`
 
+
 ## Purpose
 
 This document tells Cursor what data contracts, API routes, fallback states, and derived model outputs the current 949Fantasy pages need.

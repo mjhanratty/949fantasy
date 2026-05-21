@@ -1,5 +1,8 @@
 # 949Fantasy Working Brief
 
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-working-brief.md`
+
+
 ## Role Split
 
 - Codex: product logic, data model, ranking methodology, implementation requirements, QA criteria, and build handoff notes.
@@ -34,6 +37,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-data-source-matrix.md`: full data source table for supporting Claude-created views, Coach, GM, Draft, Analytics, and Vercel integration planning.
 - `949fantasy-vercel-env-plan.md`: prioritized Vercel environment variable plan for V0 testing, free NFL data, Supabase, Coach/GM, and V1 provider integrations.
 - `949fantasy-workbook-analysis-notes.md`: workbook-specific analysis of `Fantasy Rankings`, value grading, current floor/ceiling formulas, validation gaps, and production model requirements.
+- `949fantasy-localhost-rapidapi-notes.md`: local Next.js scaffold status, RapidAPI route test notes, and remaining `.env.local` blocker for live NFL data.
 
 ## Current HTML View Inventory
 

@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md`
 
+
 ## Purpose
 
 This document defines the 949Fantasy dynamic draft market engine for GM and the shared decision logic that Coach can reuse in-season.

@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-page-content-spec.md`
 
+
 ## Purpose
 
 This document translates the FigJam reference notes into 949Fantasy product content requirements.

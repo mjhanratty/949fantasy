@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-data-source-matrix.md`
 
+
 ## Purpose
 
 This table lists every data source 949Fantasy needs to support the current Claude-created views and the Codex product logic described so far.

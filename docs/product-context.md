@@ -15,6 +15,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [draft-market-engine.md](./draft-market-engine.md) | GM/Coach engine |
 | [draft-theory-source-notes.md](./draft-theory-source-notes.md) | Draft research → lessons |
 | [ia-routes.md](./ia-routes.md) | Routes |
+| [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) | V0 RapidAPI scaffold, `.env.local` blocker, test flow |
 | [design-reference.md](./design-reference.md) | `prototype/` shell |
 
 ## Environment & hosting
@@ -44,7 +45,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
 for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff \
-  data-source-matrix metrics-glossary draft-market-engine draft-theory-source-notes; do
+  data-source-matrix metrics-glossary draft-market-engine draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
 ```

@@ -2,6 +2,7 @@
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-metrics-glossary.md`
 
+
 ## Purpose
 
 This document defines the first-pass 949Fantasy metric system.

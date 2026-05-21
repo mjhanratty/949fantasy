@@ -24,6 +24,13 @@ Collapsible top nav; **franchise selector** near account (multi-team, setup ques
 
 Tier 1–3 positional benchmark when league/opponent data unavailable.
 
+## V0 dev (implemented)
+
+| Surface | Route | Notes |
+|---------|-------|--------|
+| Data lab | `/data-lab` | RapidAPI teams test UI — [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) |
+| NFL teams proxy | `GET /api/nfl/teams` | Server-only RapidAPI; CORS for `http://localhost:3456` prototype |
+
 ## Next.js routes (target)
 
 | Surface | Route | API prefix (handoff) |
