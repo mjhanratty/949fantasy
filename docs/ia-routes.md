@@ -29,7 +29,8 @@ Tier 1–3 positional benchmark when league/opponent data unavailable.
 | Surface | Route | Notes |
 |---------|-------|--------|
 | Data lab | `/data-lab` | RapidAPI teams test UI — [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) |
-| NFL teams proxy | `GET /api/nfl/teams` | Server-only RapidAPI; CORS for `http://localhost:3456`; prototype hydrates `TEAMS` on load |
+| NFL teams proxy | `GET /api/nfl/teams` | Server-only RapidAPI; CORS for `http://localhost:3456` |
+| Demo roster stats | `GET /api/nfl/roster-stats` | Sleeper 2025 weekly PPR → mock persona ids; see [v0-roster-stats-bridge.md](./v0-roster-stats-bridge.md) |
 
 ## Next.js routes (target)
 

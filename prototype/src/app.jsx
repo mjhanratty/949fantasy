@@ -185,9 +185,13 @@ function TopNav({ current, sub, onNavigate, collapsed, setCollapsed }) {
               fontSize: 10, color: dataTone, letterSpacing: "0.08em",
               textTransform: "uppercase", whiteSpace: "nowrap"
             }}>
-              {dataStatus.status === "live" ? `NFL Live · ${dataStatus.teamsLoaded}` :
-               dataStatus.status === "loading" ? "NFL Loading" :
-               "NFL Mock"}
+              {dataStatus.status === "live" && dataStatus.rosterStats === "live"
+                ? `2025 Live · ${dataStatus.rosterMerged || 0} roster`
+                : dataStatus.status === "live"
+                  ? `NFL Live · ${dataStatus.teamsLoaded}`
+                  : dataStatus.status === "loading"
+                    ? "NFL Loading"
+                    : "NFL Mock"}
             </span>
           </div>
           <button title="Notifications" style={{
@@ -255,7 +259,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (typeof window.hydrateNflTeamsFromApi === "function") {
+    if (typeof window.hydrateDemoDataFromApi === "function") {
+      window.hydrateDemoDataFromApi();
+    } else if (typeof window.hydrateNflTeamsFromApi === "function") {
       window.hydrateNflTeamsFromApi();
     }
   }, []);
