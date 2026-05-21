@@ -1,6 +1,6 @@
 # 949Fantasy Draft Market Engine
 
-> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md` · [draft-theory-source-notes.md](./draft-theory-source-notes.md) · [page-content-spec.md](./page-content-spec.md)
+> **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-market-engine.md`
 
 ## Purpose
 

@@ -33,6 +33,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-draft-theory-source-notes.md`: article/research-derived draft theory notes used to ground the GM engine.
 - `949fantasy-cursor-piping-handoff.md`: Cursor-facing data/API piping instructions for current pages, GM/Coach, fallbacks, and Vercel connections.
 - `949fantasy-data-source-matrix.md`: full data source table for supporting Claude-created views, Coach, GM, Draft, Analytics, and Vercel integration planning.
+- `949fantasy-vercel-env-plan.md`: prioritized Vercel environment variable plan for V0 testing, free NFL data, Supabase, Coach/GM, and V1 provider integrations.
 
 ## Current HTML View Inventory
 
