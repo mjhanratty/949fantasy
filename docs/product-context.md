@@ -13,6 +13,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [data-source-matrix.md](./data-source-matrix.md) | V0/V1/V1.1/V2 data sources |
 | [metrics-glossary.md](./metrics-glossary.md) | Metric names, formulas |
 | [draft-market-engine.md](./draft-market-engine.md) | GM/Coach engine |
+| [evaluator-layering-spec.md](./evaluator-layering-spec.md) | Shared GM/Coach evaluator layers, consensus, AI boundaries |
 | [draft-theory-source-notes.md](./draft-theory-source-notes.md) | Draft research → lessons |
 | [ia-routes.md](./ia-routes.md) | Routes |
 | [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) | V0 RapidAPI + Sleeper stats hydration |
@@ -37,7 +38,8 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 ## Implementation snapshot
 
 - **Franchise modes:** `connected_league` · `manual_draft_room` · `manual_user_roster` · `demo_or_empty`
-- **Draft / GM:** board, simulator, 7 bands, ticker, queue, alerts, value grades — see piping handoff + page spec
+- **GM / Coach architecture:** [evaluator-layering-spec.md](./evaluator-layering-spec.md) — data → specialist evaluators → consensus → risk → AI explanation (not prompt-only)
+- **Draft / GM:** board, simulator, 7 bands, ticker, queue, alerts, value grades — see piping handoff + page spec + draft engine
 - **Coach:** advisory only; Insights, scenarios, Q&A — no auto lineup submit
 - **Metrics / projections:** [metrics-glossary.md](./metrics-glossary.md); workbook lineage in [workbook-analysis-notes.md](./workbook-analysis-notes.md) (70% hit-rate target; current bands ~6–23% on audit)
 
@@ -46,7 +48,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
 for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff \
-  data-source-matrix metrics-glossary draft-market-engine draft-theory-source-notes localhost-rapidapi-notes; do
+  data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
 ```

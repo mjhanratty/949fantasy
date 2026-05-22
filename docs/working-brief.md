@@ -32,6 +32,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-page-content-spec.md`: FigJam notes translated into page content, metrics, toggles, and data dependencies.
 - `949fantasy-metrics-glossary.md`: metric names, definitions, formulas, priorities, and validation rules.
 - `949fantasy-draft-market-engine.md`: GM and Coach market-engine architecture, draft theory knowledge base, scoring pipeline, simulations, and AI boundaries.
+- `949fantasy-evaluator-layering-spec.md`: shared evaluator architecture for GM and Coach, consensus layering, deterministic vs AI responsibilities, and player lifecycle/cliff modeling.
 - `949fantasy-draft-theory-source-notes.md`: article/research-derived draft theory notes used to ground the GM engine.
 - `949fantasy-cursor-piping-handoff.md`: Cursor-facing data/API piping instructions for current pages, GM/Coach, fallbacks, and Vercel connections.
 - `949fantasy-data-source-matrix.md`: full data source table for supporting Claude-created views, Coach, GM, Draft, Analytics, and Vercel integration planning.
