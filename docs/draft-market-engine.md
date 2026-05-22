@@ -298,6 +298,304 @@ rb_upside_score =
 
 Later versions should add WR and TE-specific upside modules after source validation.
 
+## Draft Spend Canal
+
+The `Draft spend` component should be modeled as a declining value canal, not as three arbitrary comparison lines.
+
+The core visual truth:
+
+- draft capital declines as the draft progresses
+- expected player value declines with that capital
+- the spread of realistic outcomes also declines, but does not disappear
+- late-round surprises can outperform expectation without breaking the system
+
+This means the chart should preserve a downward slope by draft round or pick window while still allowing individual players to beat expectation inside a bounded value band.
+
+### Core Interpretation
+
+For each user pick window, the chart should show:
+
+- `your_pick_value`
+- `round_expected_value`
+- `round_ceiling_value`
+- optional `round_floor_value`
+- optional `best_same_position_value`
+
+Recommended visual interpretation:
+
+- solid mint line = `your_pick_value`
+- dashed white line = `round_expected_value`
+- dotted blue line = `round_ceiling_value`
+- hover detail = `best_same_position_value`, edge, grade, and alternative outcomes
+
+This keeps the chart elegant while preserving deeper diagnostic detail in interaction.
+
+### Pick Window Definition
+
+For V1, use draft rounds as the user-facing unit.
+
+Internally, the engine should treat each round as a market window.
+
+Later, this can become a more precise `pick window` based on:
+
+- league size
+- snake position
+- exact pick number
+- neighboring ADP cluster
+
+Initial approximation:
+
+```txt
+pick_window = round_number
+```
+
+Later version:
+
+```txt
+pick_window =
+  players drafted within +/- league_size / 2 picks
+  around the user's pick slot
+```
+
+### Value Unit
+
+The chart should not use raw points as its only intelligence layer.
+
+Primary unit:
+
+```txt
+player_value_ratio =
+  player_points_or_projection
+  / positional_average_points_or_projection
+```
+
+This keeps QB, RB, WR, and TE comparisons from being distorted by raw scoring totals alone.
+
+For the visual chart, 949 can still display a smoothed `value points` number if desired:
+
+```txt
+value_points =
+  player_value_ratio * 100
+```
+
+This creates a legible chart scale while preserving the value framework.
+
+### Your Pick
+
+`your_pick_value` should represent the value returned by the player selected by the user in that round window.
+
+Depending on the selected mode:
+
+#### Draft-day mode
+
+```txt
+your_pick_value =
+  player_projected_value_ratio_at_draft_time
+```
+
+#### Season-result mode
+
+```txt
+your_pick_value =
+  player_realized_value_ratio
+```
+
+#### ROS mode
+
+```txt
+your_pick_value =
+  player_current_ros_value_ratio
+```
+
+Recommended default:
+
+- `season-result mode` for retrospective
+- `draft-day mode` if the season is not complete
+
+### Round Expected Value
+
+This is the center line of the canal.
+
+It should represent the typical value outcome a manager should expect from that draft window.
+
+Recommended formula:
+
+```txt
+round_expected_value =
+  median(player_value_ratio for all players drafted in round_window)
+```
+
+Use median, not mean, so one breakout player does not distort the center of the market.
+
+### Round Ceiling Value
+
+This is the upper rail of the canal.
+
+It should represent a strong but still realistic top-end outcome from that draft window without letting extreme outliers define the whole lane.
+
+Recommended formula:
+
+```txt
+round_ceiling_value =
+  percentile_75(player_value_ratio for all players drafted in round_window)
+```
+
+Alternative more aggressive version:
+
+```txt
+round_ceiling_value =
+  percentile_80(player_value_ratio for all players drafted in round_window)
+```
+
+Do not use absolute max by default. One league-winning outlier should not cause the canal to explode.
+
+### Round Floor Value
+
+This is the lower rail of the canal if needed for future views or hover context.
+
+Recommended formula:
+
+```txt
+round_floor_value =
+  percentile_25(player_value_ratio for all players drafted in round_window)
+```
+
+This creates a bounded, interpretable lane.
+
+### Best Overall Value In Window
+
+If we need to surface the single best player outcome from the round, do not use it as the main chart rail by default.
+
+Use it in hover or detail mode.
+
+Formula:
+
+```txt
+best_overall_value_in_window =
+  max(player_value_ratio for all players drafted in round_window)
+```
+
+This is useful for regret analysis and narrative, but it is too volatile to define the canal itself.
+
+### Best Same-Position Value
+
+If the user's pick in a round is an RB, then the positional benchmark should be the best RB in that same round window, not just the best player overall.
+
+Formula:
+
+```txt
+best_same_position_value =
+  max(
+    player_value_ratio
+    for players in round_window
+    where player.position == your_pick.position
+  )
+```
+
+This should usually appear on hover, in a detail drawer, or in the round-level tooltip, rather than as the dominant chart rail.
+
+### Canal Constraint
+
+One important rule:
+
+The canal should allow late-round hits to outperform expectation, but should not let isolated outliers break the visual model.
+
+To preserve that:
+
+1. build the canal from distribution statistics, not absolute max/min
+2. smooth adjacent rounds
+3. cap abrupt round-to-round jumps unless justified by real distribution shifts
+
+Suggested smoothing:
+
+```txt
+smoothed_round_expected_value(round_n) =
+  0.25 * expected_value(round_n - 1)
+  + 0.50 * expected_value(round_n)
+  + 0.25 * expected_value(round_n + 1)
+```
+
+And the same can be applied to `round_ceiling_value` and `round_floor_value`.
+
+### Monotonic Decline Rule
+
+The expected canal should generally move down as the draft progresses.
+
+Use a monotonic soft constraint:
+
+```txt
+round_expected_value(round_n + 1) <= round_expected_value(round_n) + tolerance
+```
+
+Where:
+
+```txt
+tolerance = small smoothing allowance
+```
+
+This prevents weird upward spikes late in the draft while still allowing individual player lines to exceed round expectation.
+
+### Net Edge
+
+The chip on the card should summarize how efficiently the user spent draft capital across the displayed rounds.
+
+Recommended formula:
+
+```txt
+net_edge =
+  sum(your_pick_value - round_expected_value for each user_pick_round)
+```
+
+If displayed as points instead of raw ratio:
+
+```txt
+net_edge_points =
+  sum(your_pick_value_points - round_expected_value_points)
+```
+
+Positive value means the user beat expected market value across those picks.
+
+### Pick Efficiency
+
+Each pick can also receive a round-level efficiency score:
+
+```txt
+pick_efficiency =
+  your_pick_value - round_expected_value
+```
+
+Interpretation:
+
+- above zero = efficient spend
+- near zero = market-expected spend
+- below zero = weak spend
+
+### Detail Tooltip Fields
+
+When the user hovers or taps a round point, show:
+
+- drafted player
+- draft slot
+- player position
+- value grade
+- `your_pick_value`
+- `round_expected_value`
+- `round_ceiling_value`
+- `best_same_position_value`
+- `best_overall_value_in_window`
+- pick efficiency
+
+### V1 Build Rule
+
+For V1:
+
+- keep the chart visually close to the current prototype
+- reinterpret the lines as a value canal
+- use distribution-based rail formulas
+- use same-position best as a detail layer, not the primary top rail
+
+This preserves the current UI concept while making the logic much stronger and more stable.
+
 ## Article Knowledge Base
 
 Store draft theory as structured concepts, not raw article dumps.
