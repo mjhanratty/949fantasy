@@ -344,6 +344,10 @@ The model should be honest: it is predicting how another person will perform in 
 
 Weekly floor/ceiling must be player-specific, not position-wide. Stable players should show tighter ranges; volatile, role-sensitive, or low-confidence players should show wider ranges or lower confidence. If the range must become absurdly wide to hit the target coverage, show low confidence instead of expanding the UI band.
 
+Season floor/ceiling must be calculated separately from weekly floor/ceiling. Do not sum every weekly ceiling to create a season ceiling, because that assumes a player hits the top of his likely weekly range every week. Weekly ranges can be wider because single games are noisy; season ranges should be tighter because variance smooths over 15-17 games.
+
+Season ranges should respect the player's historical season profile. If a player has never approached 400 points, a 400+ season should be labeled as an outlier or stretch outcome, not the normal ceiling. If a player has repeatedly lived near 385, then a 400-point ceiling may be reasonable and a floor around the mid-330s may be honest depending on role and health.
+
 Floor and ceiling are likely-performance bands, not career-minimum and career-maximum claims. Do not let benching, playoff safety, injury exits, or other disrupted-role games redefine a player's normal floor unless those events change the forward-looking role or availability profile.
 
 The model should hold its core prediction through short-term scoring misses when the role is intact:

@@ -311,6 +311,8 @@ Cursor should support all three because the user is choosing a risk posture, not
 
 Floor and ceiling must be player-specific. Do not use one position-wide QB/RB/WR range for every player. Player volatility, role stability, historical miss profile, availability risk, and archetype should drive the width of the weekly range.
 
+Weekly and season floor/ceiling are separate calculations. Do not calculate a season ceiling by summing every weekly ceiling, and do not calculate a season floor by summing every weekly floor. Weekly ranges can be loose because individual games are noisy; season ranges should be tighter and anchored to the player's historical season profile.
+
 Floor and ceiling are likely-performance bands. They are not absolute career-low and career-high scores. Cursor should preserve outlier context in model outputs so Coach can distinguish:
 
 - below-floor injury/early-exit games.

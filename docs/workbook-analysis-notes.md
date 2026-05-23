@@ -219,6 +219,13 @@ The production model should rebuild ceiling/floor around three separate ideas:
 - `expected_range`: the cleaner user-facing floor/ceiling shown in rankings, GM, Coach, and Player Tape.
 - `calibrated_range`: the internal model range tuned to hit roughly 70% coverage after excluding major availability/injury events.
 
+Weekly and season ranges must be separate products.
+
+- Weekly floor/ceiling can be wider because a single game can swing on opponent, weather, injury exits, game script, missing teammates, or a disrupted offensive line.
+- Season floor/ceiling should be tighter because variance smooths across the schedule.
+- Do not create season ceiling by summing every weekly ceiling, and do not create season floor by summing every weekly floor.
+- Season ranges should be anchored to the player's historical season totals, games played, role security, and availability profile.
+
 ### Step 1: Build A Conservative Median
 
 Do not use raw historical trend as the center of the range by itself.
