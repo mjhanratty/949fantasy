@@ -309,6 +309,60 @@ For QB, position-specific context should include:
 
 Other positions will need their own position-specific context.
 
+## 949 Matchup And Environment Index
+
+949Fantasy should build its own matchup index instead of depending on DVOA as a black box.
+
+The index should combine defensive efficiency, offensive context, venue, weather, and player archetype. SportsDataIO can supply much of the raw data, but 949 should own the derived score, weights, and explanations.
+
+Recommended components:
+
+```txt
+matchup_environment_index =
+  defense_efficiency_component
+  + pass_rush_pressure_component
+  + turnover_component
+  + red_zone_component
+  + venue_component
+  + weather_component
+  + team_climate_travel_component
+  + player_archetype_component
+```
+
+For QB projections, the index should prioritize QB-relevant defense instead of broad points allowed:
+
+- pass yards allowed.
+- pass touchdowns allowed.
+- sacks and pressure.
+- interceptions and turnover creation.
+- explosive pass rate allowed.
+- red-zone pass defense.
+- QB rushing containment where available.
+- fantasy points allowed to QBs.
+- schedule-adjusted opponent quality.
+
+Weather and venue priors to test:
+
+| Context | Expected Direction |
+| --- | --- |
+| Rain | Shorter passing routes, lower catch depth, more run/YAC emphasis |
+| Snow | Lower catch efficiency, more run/YAC emphasis, higher broken-play volatility |
+| Cold | Catch rates can fall; tackling may degrade late; warm-state teams may underperform outdoors after Oct. 31 |
+| Heat | More fourth-quarter fatigue and broken-play upside |
+| Humidity | Can hurt cold-weather teams early in the season |
+| Dome or indoor team outdoors in cold | Possible passing efficiency and timing penalty |
+| Outdoor cold or wind | Passing depth and accuracy penalty; rushing/QB legs can become more valuable |
+| Wet field | More missed tackles, but also more ball-security risk |
+
+These should start as explicit priors with conservative weights, then be backtested before becoming strong projection modifiers. The model should report them as context notes even when the adjustment is small.
+
+The index should be position-aware:
+
+- QB: passing efficiency, pressure, rushing floor, wind/cold sensitivity.
+- RB: run defense, offensive line, wet/cold tackle environment, game script.
+- WR/TE: catch rate, route depth, wind, rain/snow, defensive coverage and target concentration.
+- DST: opposing offense quality, sacks, turnovers, weather, and game total.
+
 ## Accuracy Metrics To Track
 
 For every position test, track:

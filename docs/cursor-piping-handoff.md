@@ -772,6 +772,11 @@ These are the data connections Codex/user will build or configure as needed.
   - No full ESPN league sync in V1 unless a reliable path is confirmed.
 - Weather provider if SportsDataIO weather is insufficient:
   - Stadium forecast by kickoff.
+- 949 matchup/environment index:
+  - Derived internally from SportsDataIO/nflverse/weather inputs.
+  - Do not require external DVOA.
+  - Include defensive efficiency, pass rush, turnovers, red-zone defense, venue, weather, climate-fit, and player-archetype modifiers.
+  - Weather priors should remain explainable and conservative until backtested.
 - News provider:
   - SportsDataIO first.
   - External source aggregation later if needed.
