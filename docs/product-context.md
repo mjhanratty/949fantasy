@@ -12,7 +12,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
 | [cursor-piping-handoff.md](./cursor-piping-handoff.md) | API contracts, franchise modes |
 | [games-feed-handoff.md](./games-feed-handoff.md) | Games surface: matchup feed, top players, cache/refresh |
-| [claude-content-piping.md](./claude-content-piping.md) | Claude Cowork content API, brief packets, no raw DB access |
+| [claude-content-piping.md](./claude-content-piping.md) | Claude Cowork briefs, review/posting queue, SVG drafts, no raw DB |
 | [coach-gm-cache-weekly-ops.md](./coach-gm-cache-weekly-ops.md) | Coach/GM cache layers, weekly Value Score ops, manual waiver fallback |
 | [data-source-matrix.md](./data-source-matrix.md) | V0/V1/V1.1/V2 data sources |
 | [metrics-glossary.md](./metrics-glossary.md) | Metric names, formulas |

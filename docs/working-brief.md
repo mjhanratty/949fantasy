@@ -42,7 +42,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-coach-gm-cache-weekly-ops.md`: Coach/GM cache strategy, weekly Value Score refresh cadence, manual waiver paste fallback, GM simulator recap requirements, and SEO/content operations notes.
 - `949fantasy-player-value-modeling.md`: position-agnostic player value modeling handoff, current QB validation slice, baseline pool rules, fragile value concept, and next model-layer requirements.
 - `949fantasy-games-feed-handoff.md`: Games surface data contract, top player selection rules, refresh cadence, and low-API cache strategy.
-- `949fantasy-claude-content-piping.md`: Claude / Claude Cowork content API piping, endpoint shapes, auth, safety rules, and content packet workflow.
+- `949fantasy-claude-content-piping.md`: Claude / Claude Cowork content API piping, scheduled content ops, review queue, posting queue, SVG asset library, visual drafts, endpoint shapes, auth, safety rules, and content packet workflow.
 
 ## Current HTML View Inventory
 

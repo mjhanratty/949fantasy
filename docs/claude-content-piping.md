@@ -46,10 +46,24 @@ Use a controlled backend content API:
 Supabase computed tables
 -> Next.js /api/content/briefs routes
 -> Claude Cowork
--> draft content artifacts
+-> content_drafts rows with status = needs_review
+-> review queue
+-> approved content
+-> posting queue
 ```
 
 Claude should call internal 949 endpoints that return safe, compact JSON.
+
+Claude Cowork should be treated as a scheduled content-production assistant, not as the final publisher.
+
+Recommended operating rule:
+
+```txt
+Claude Cowork can create.
+Claude Cowork can suggest.
+Claude Cowork can summarize.
+Claude Cowork cannot publish without approval.
+```
 
 ## Where To Build
 
@@ -390,6 +404,223 @@ Claude Cowork can generate:
 
 Content should be generated from packet data and model summaries.
 
+## Content Ops Pipeline
+
+Recommended production pipeline:
+
+```txt
+Database
+-> scheduled Claude job
+-> content_drafts table
+-> review queue
+-> approved content
+-> posting_queue
+-> platform publisher
+-> performance tracking
+```
+
+Separate draft creation from posting.
+
+### Worker 1: Content Generator
+
+Runs on schedule.
+
+Input:
+
+- computed player values.
+- risers/fallers.
+- injuries/news.
+- usage trends.
+- draft/ADP movement.
+- Coach/GM reason-code summaries.
+
+Output:
+
+```txt
+content_drafts.status = "needs_review"
+```
+
+### Worker 2: Publisher
+
+Runs every 15-30 minutes.
+
+Input:
+
+```txt
+approved content
+```
+
+Output:
+
+```txt
+posted | failed
+```
+
+Do not let the same job create and publish content.
+
+## Content Drafts Table
+
+Create a table similar to:
+
+```sql
+create table public.content_drafts (
+  id uuid primary key default gen_random_uuid(),
+  content_type text not null,
+  platform text not null,
+  title text,
+  body text not null,
+  player_ids uuid[] default '{}',
+  source_data_snapshot jsonb not null,
+  model_used text,
+  confidence_score numeric,
+  status text not null default 'needs_review',
+  scheduled_for timestamptz,
+  created_at timestamptz default now(),
+  reviewed_at timestamptz,
+  approved_by uuid,
+  posted_at timestamptz
+);
+```
+
+Recommended statuses:
+
+- `draft`
+- `needs_review`
+- `approved`
+- `rejected`
+- `scheduled`
+- `posted`
+- `failed`
+
+Claude Cowork should only create drafts with:
+
+```txt
+status = "needs_review"
+```
+
+## Posting Queue Table
+
+Create a separate posting queue after approval:
+
+```sql
+create table public.posting_queue (
+  id uuid primary key default gen_random_uuid(),
+  content_draft_id uuid references public.content_drafts(id),
+  platform text not null,
+  scheduled_for timestamptz not null,
+  status text not null default 'scheduled',
+  attempt_count integer not null default 0,
+  last_error text,
+  posted_url text,
+  created_at timestamptz default now(),
+  posted_at timestamptz
+);
+```
+
+Only approved content should enter this table.
+
+## Admin Review Page
+
+Create an internal review surface:
+
+```txt
+/admin/content-review
+```
+
+Each draft should show:
+
+- platform.
+- content type.
+- generated headline.
+- post copy.
+- players referenced.
+- stats used.
+- confidence score.
+- source snapshot.
+- model summary.
+- approve / edit / reject controls.
+
+Every Claude-generated claim should be reviewable against the underlying database inputs.
+
+Example:
+
+Claim:
+
+```txt
+Player X is trending up after three straight weeks of target growth.
+```
+
+Review evidence:
+
+```txt
+Week 1 targets: 5
+Week 2 targets: 7
+Week 3 targets: 9
+Trend flag: positive
+```
+
+The admin is reviewing Claude's interpretation of 949 data, not ungrounded prose.
+
+## Suggested Content Cadence
+
+Fantasy season cadence:
+
+| Time | Content Job |
+|---|---|
+| Monday night | Recalculate value scores after full week |
+| Tuesday morning | Waiver and trend content |
+| Wednesday morning | Ranking movement and matchup content |
+| Thursday morning | Start/sit and Thursday Night Football content |
+| Friday morning | Injury-impact content |
+| Sunday morning | Last-minute start/sit alerts |
+| Sunday night | Recap notes, not full ranking reset |
+
+Monday night should remain the big value-score sync.
+
+## Review Layers
+
+Review every draft in three layers:
+
+### 1. Data Check
+
+Does the claim match the database?
+
+Example:
+
+```txt
+Claim: Player is rising.
+Check: value_score_delta > 0, usage_delta > 0, rank_change positive.
+```
+
+### 2. Brand Check
+
+Good:
+
+- clear.
+- sharp.
+- confident.
+- data-backed.
+- premium.
+- clean.
+
+Avoid:
+
+- hypey.
+- gambling-coded.
+- sportsbook-coded.
+- bro-sports tone.
+- overpromising.
+
+### 3. Publishing Check
+
+Match format to platform:
+
+- X: short and punchy.
+- Threads: slightly more explanatory.
+- Instagram: visual/carousel-friendly.
+- Insights: longer analysis.
+- Email: concise weekly digest.
+
 ## Example Claude Cowork Task
 
 Prompt:
@@ -420,6 +651,11 @@ Claude Cowork process:
 8. Keep payload compact.
 9. Do not expose user-private data.
 10. Document example requests for Claude Cowork.
+11. Add `content_drafts` table.
+12. Add `/admin/content-review`.
+13. Add approve / reject / edit actions.
+14. Add `posting_queue` table after review flow works.
+15. Add publisher worker only after approval flow is proven.
 
 ## V0 Mocking
 
@@ -451,3 +687,230 @@ Production packets should use:
 - Content endpoints return compact model outputs and editorial guidance.
 - 949 backend owns the numbers.
 - Claude owns wording, packaging, and content formats.
+- Claude Cowork does not publish without approval.
+
+## SVG Asset Library And Visual Drafts
+
+Claude should not invent brand visuals from scratch.
+
+Use an approved SVG asset library plus metadata table.
+
+Recommended visual flow:
+
+```txt
+SVG Asset Library
+-> Supabase Storage
+-> svg_assets metadata table
+-> Claude visual draft selection
+-> visual_drafts table
+-> rendered preview
+-> human review
+-> approved export/post
+```
+
+Claude should be an assembler, not the designer.
+
+### Supabase Storage Bucket
+
+Create a bucket:
+
+```txt
+svg-assets
+```
+
+Recommended folder structure:
+
+```txt
+svg-assets/
+  brand/
+    logo-949-stacked.svg
+    logo-949-wordmark.svg
+  icons/
+    trend-up.svg
+    trend-down.svg
+    waiver-wire.svg
+    injury-alert.svg
+    lock-premium.svg
+  badges/
+    value-a-plus.svg
+    value-a.svg
+    value-b.svg
+    value-c.svg
+    value-d.svg
+    value-f.svg
+  positions/
+    qb.svg
+    rb.svg
+    wr.svg
+    te.svg
+  templates/
+    weekly-riser-card.svg
+    weekly-faller-card.svg
+    top-10-rankings-card.svg
+    waiver-watch-card.svg
+    start-sit-card.svg
+    injury-impact-card.svg
+    value-score-card.svg
+    player-comparison-card.svg
+    premium-preview-card.svg
+    weekly-recap-card.svg
+  backgrounds/
+    mint-grid.svg
+    deep-green-noise.svg
+    chart-grid.svg
+```
+
+Do not store copyrighted NFL logos, team logos, or player likenesses unless rights are secured.
+
+### SVG Assets Table
+
+```sql
+create table public.svg_assets (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text unique not null,
+  category text not null,
+  description text,
+  storage_path text not null,
+  public_url text,
+  tags text[] default '{}',
+  allowed_platforms text[] default '{}',
+  color_mode text default 'brand',
+  aspect_ratio text,
+  width integer,
+  height integer,
+  is_template boolean default false,
+  is_active boolean default true,
+  brand_safe boolean default true,
+  usage_notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+```
+
+Example row:
+
+```txt
+name: Weekly Riser Card
+slug: weekly-riser-card
+category: templates
+description: Social card template for players moving up in weekly value score.
+storage_path: templates/weekly-riser-card.svg
+tags: ["weekly", "riser", "value_score", "social", "x", "instagram"]
+allowed_platforms: ["x", "threads", "instagram", "insights"]
+aspect_ratio: "1:1"
+is_template: true
+brand_safe: true
+usage_notes: Use for players with positive value_score_delta and rank improvement.
+```
+
+### SVG Template Variables
+
+Use placeholders inside SVG templates:
+
+```svg
+<text id="player_name">{{PLAYER_NAME}}</text>
+<text id="position">{{POSITION}}</text>
+<text id="value_score">{{VALUE_SCORE}}</text>
+<text id="rank_change">{{RANK_CHANGE}}</text>
+<text id="headline">{{HEADLINE}}</text>
+```
+
+Claude should return structured variables. The system should replace placeholders programmatically.
+
+Example:
+
+```json
+{
+  "template_slug": "weekly-riser-card",
+  "variables": {
+    "PLAYER_NAME": "Davante Adams",
+    "POSITION": "WR",
+    "VALUE_SCORE": "1.21",
+    "RANK_CHANGE": "+6",
+    "HEADLINE": "Trending Up"
+  }
+}
+```
+
+### Visual Drafts Table
+
+```sql
+create table public.visual_drafts (
+  id uuid primary key default gen_random_uuid(),
+  content_draft_id uuid references public.content_drafts(id),
+  template_slug text not null,
+  asset_slugs text[] default '{}',
+  variables jsonb not null,
+  rendered_svg_path text,
+  rendered_png_path text,
+  status text default 'needs_review',
+  created_at timestamptz default now(),
+  reviewed_at timestamptz
+);
+```
+
+Recommended statuses:
+
+- `needs_review`
+- `approved`
+- `rejected`
+- `needs_revision`
+- `rendered`
+- `posted`
+
+### Visual Review Page
+
+Create:
+
+```txt
+/admin/visual-review
+```
+
+Each visual draft should show:
+
+- template used.
+- assets used.
+- rendered preview.
+- player/stat inputs.
+- Claude reasoning.
+- approve / edit variables / reject / regenerate controls.
+
+### Visual Safety Rules
+
+Enforce:
+
+- No NFL team logos without rights.
+- No player photos without rights.
+- No sportsbook-style graphics.
+- No betting language.
+- No fake injury claims.
+- No guaranteed-outcome language.
+- No unapproved colors.
+- No SVG scripts.
+- No external image hrefs inside SVGs.
+
+SVGs must be sanitized before rendering.
+
+Strip:
+
+```txt
+<script>
+onload=
+onclick=
+foreignObject
+external hrefs
+remote image links
+```
+
+### Minimum Viable Visual Library
+
+Start with:
+
+- 10 templates.
+- 20 icons/badges.
+- 1 Supabase Storage bucket.
+- `svg_assets` table.
+- `visual_drafts` table.
+- one Claude visual-selection prompt.
+- one review page.
