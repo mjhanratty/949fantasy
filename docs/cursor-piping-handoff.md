@@ -13,6 +13,8 @@ Related update: see `949fantasy-coach-gm-cache-weekly-ops.md` for the Coach/GM c
 
 Games update: see `949fantasy-games-feed-handoff.md` for the planned Games surface, top QB/RB/receiver selection rules, live/cached game feed contract, and low-API refresh strategy.
 
+Content automation update: see `949fantasy-claude-content-piping.md` for Claude / Claude Cowork content brief endpoints, auth, packet shapes, and safety boundaries.
+
 ## Current HTML / React Framing Read
 
 The supplied `949Fantasy (2).zip` contains the current view code:

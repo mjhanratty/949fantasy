@@ -12,6 +12,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
 | [cursor-piping-handoff.md](./cursor-piping-handoff.md) | API contracts, franchise modes |
 | [games-feed-handoff.md](./games-feed-handoff.md) | Games surface: matchup feed, top players, cache/refresh |
+| [claude-content-piping.md](./claude-content-piping.md) | Claude Cowork content API, brief packets, no raw DB access |
 | [coach-gm-cache-weekly-ops.md](./coach-gm-cache-weekly-ops.md) | Coach/GM cache layers, weekly Value Score ops, manual waiver fallback |
 | [data-source-matrix.md](./data-source-matrix.md) | V0/V1/V1.1/V2 data sources |
 | [metrics-glossary.md](./metrics-glossary.md) | Metric names, formulas |
@@ -36,7 +37,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 |-------|--------|
 | **Codex** | Logic, metrics, schemas, ingestion, Vercel/Supabase |
 | **Cursor** | Next app — [cursor-piping-handoff.md](./cursor-piping-handoff.md) |
-| **Claude** | UI exploration |
+| **Claude** | UI exploration; content via [claude-content-piping.md](./claude-content-piping.md) (`/api/content/briefs`) |
 
 ## Implementation snapshot
 
@@ -51,7 +52,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
-for f in working-brief workbook-analysis-notes player-value-modeling v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops games-feed-handoff \
+for f in working-brief workbook-analysis-notes player-value-modeling v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops games-feed-handoff claude-content-piping \
   data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
