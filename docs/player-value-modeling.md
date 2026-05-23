@@ -152,9 +152,9 @@ The added 6 QBs were more average, unstable, injured, or role-sensitive profiles
 
 Files:
 
-- `949fantasy-qb-grade-validation-prototype.csv`
-- `949fantasy-qb-grade-validation-12qb.csv`
-- `949fantasy-qb-grade-validation-12qb-summary.csv`
+- `docs/data/qb-grade-validation-prototype.csv`
+- `docs/data/qb-grade-validation-12qb.csv`
+- `docs/data/qb-grade-validation-12qb-summary.csv`
 
 ## QB Baseline Used In 12-QB Test
 
@@ -325,6 +325,58 @@ For every position test, track:
 - injury-excluded accuracy.
 - injury-included accuracy.
 - player-level volatility.
+
+## Lineup Optimization Translation
+
+Floor/ceiling honesty matters most in Start/Sit Studio and lineup optimization.
+
+The app should not optimize only one lineup total and pretend that outcome is certain. It should support three lineup views:
+
+```txt
+median_lineup = highest expected lineup
+floor_lineup = safest lineup
+ceiling_lineup = highest-upside lineup
+```
+
+The median lineup is the default recommendation. The floor lineup is the safer alternative when the user is favored or wants to avoid a fragile player. The ceiling lineup is the chase alternative when the user is projected behind or needs a high-variance path.
+
+The model should be honest: it is predicting how another person will perform in a sport. A player can land below the modeled floor or above the modeled ceiling. When that happens, the product should treat it as an outlier signal to explain, not as a reason to make the displayed range so wide that it becomes meaningless.
+
+Weekly floor/ceiling must be player-specific, not position-wide. Stable players should show tighter ranges; volatile, role-sensitive, or low-confidence players should show wider ranges or lower confidence. If the range must become absurdly wide to hit the target coverage, show low confidence instead of expanding the UI band.
+
+Floor and ceiling are likely-performance bands, not career-minimum and career-maximum claims. Do not let benching, playoff safety, injury exits, or other disrupted-role games redefine a player's normal floor unless those events change the forward-looking role or availability profile.
+
+The model should hold its core prediction through short-term scoring misses when the role is intact:
+
+```txt
+bad game, role intact -> hold projection, note variance
+two bad games, role intact -> hold range, lower confidence/watch trend
+bad game with reduced snaps or injury -> adjust role/health factor
+two games with role loss -> update median and floor
+above ceiling with stable usage -> tag spike, do not overinflate
+above ceiling with new role -> upgrade projection
+```
+
+This prevents the product from chasing noise. The model is suggesting where a player is likely to perform, not the worst or best game he has ever had.
+
+Recommended lineup output:
+
+```ts
+type LineupScenarioTotals = {
+  medianTotal: number
+  floorTotal: number
+  ceilingTotal: number
+  opponentMedianTotal?: number
+  confidence: "high" | "medium" | "low"
+  scenario: "median" | "floor" | "ceiling"
+}
+```
+
+Coach should explain tradeoffs in plain language:
+
+```txt
+This swap raises your median by 0.4 but lowers your floor by 4.8. That is not enough gain unless you are specifically chasing ceiling.
+```
 
 ## Cursor Implementation Notes
 

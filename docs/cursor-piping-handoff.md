@@ -292,6 +292,35 @@ lineup_median = sum(player_median)
 lineup_ceiling = sum(player_ceiling)
 ```
 
+Optimization modes:
+
+```txt
+median_lineup = maximize(sum(player_median))
+floor_lineup = maximize(sum(player_floor))
+ceiling_lineup = maximize(sum(player_ceiling))
+```
+
+Cursor should support all three because the user is choosing a risk posture, not just a raw point maximum.
+
+- Median is the default lineup recommendation.
+- Floor is the safer lineup when the user is favored or protecting a lead.
+- Ceiling is the chase lineup when the user needs upside.
+- If the median lineup gives only a tiny lift but lowers floor materially, Coach should say the move is not worth the added downside unless the user is chasing ceiling.
+- If all three modes select the same players, show the lineup as high-consensus.
+- If the modes diverge, show the tradeoff clearly instead of hiding it behind one optimized total.
+
+Floor and ceiling must be player-specific. Do not use one position-wide QB/RB/WR range for every player. Player volatility, role stability, historical miss profile, availability risk, and archetype should drive the width of the weekly range.
+
+Floor and ceiling are likely-performance bands. They are not absolute career-low and career-high scores. Cursor should preserve outlier context in model outputs so Coach can distinguish:
+
+- below-floor injury/early-exit games.
+- below-floor benching or playoff-safety games.
+- below-floor bad games with normal role.
+- above-ceiling spike games with normal role.
+- above-ceiling games caused by a real role change.
+
+Do not automatically move a player's core median/floor/ceiling after one or two scoring misses if role, snaps, routes/touches/attempts, and availability are intact. In that case, keep the projection stable and reduce confidence or add a watch note. Move the forward projection only when the miss reveals a changed role, health issue, team context shift, or sustained usage change.
+
 ### Active Roster
 
 Needs:

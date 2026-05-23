@@ -1,7 +1,6 @@
 # 949Fantasy Vercel Environment Plan
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-vercel-env-plan.md`
-> **Secrets:** use `.env.local` locally (not Vercel Development env). Never commit `.env.local` or API keys.
 
 
 ## Purpose

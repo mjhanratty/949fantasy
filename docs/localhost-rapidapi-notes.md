@@ -1,7 +1,6 @@
 # 949Fantasy Localhost RapidAPI Notes
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-localhost-rapidapi-notes.md`
-> **In-repo paths:** `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts`, `app/api/nfl/teams/route.ts`, `app/api/nfl/roster-stats/route.ts`.
 
 
 ## Current Status
@@ -33,8 +32,8 @@ Implemented / restored:
   - `NFL Loading`
   - `NFL Live · {team count}`
   - `NFL Mock`
-- Server-only RapidAPI route: `app/api/nfl/teams/route.ts`
-- RapidAPI fetch/normalization helper: `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts`
+- Server-only RapidAPI route: `src/app/api/nfl/teams/route.ts`
+- RapidAPI fetch/normalization helper: `src/lib/rapidapi.ts`
 
 Verified:
 

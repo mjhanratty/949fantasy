@@ -7,6 +7,8 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [working-brief.md](./working-brief.md) | Mission, brand, handoff index |
 | [workbook-analysis-notes.md](./workbook-analysis-notes.md) | Excel `Fantasy Rankings` formulas, value grades, floor/ceiling audit, rookie model |
 | [player-value-modeling.md](./player-value-modeling.md) | Position-agnostic value model, preseason vs pace, fragile value, QB validation slice |
+| [data/qb-grade-validation-*.csv](./data/qb-grade-validation-12qb-summary.csv) | QB grade validation exports (prototype + 12-QB test) |
+| [../data/model-inputs/](../data/model-inputs/) | nflverse games/player stats for modeling backtests |
 | [v1-stack.md](./v1-stack.md) | Stack, Supabase, providers, schema |
 | [vercel-env-plan.md](./vercel-env-plan.md) | **Vercel + `.env.local`** priorities (V0 RapidAPI, feature flags, Supabase) |
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
@@ -56,6 +58,11 @@ for f in working-brief workbook-analysis-notes player-value-modeling v1-stack ve
   data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
+for f in qb-grade-validation-12qb-summary qb-grade-validation-12qb qb-grade-validation-prototype; do
+  cp "$DOCS/949fantasy-${f}.csv" docs/data/${f}.csv
+done
+mkdir -p data/model-inputs
+cp "$DOCS/data/model-inputs/"*.csv data/model-inputs/ 2>/dev/null || true
 ```
 
-After sync, restore the `> **Canonical source:**` header on each file if the copy overwrote it.
+After sync, restore the `> **Canonical source:**` header on each file if the copy overwrote it. Point `player-value-modeling.md` CSV refs at `docs/data/*.csv` if the copy reset Codex filenames.

@@ -328,6 +328,31 @@ Rookie expected range width: usually 50% - 90% of median
 
 If a range needs to exceed the guardrail to hit 70%, show a lower confidence rating instead of making the displayed range absurdly wide.
 
+### Step 4A: Keep Floor/Ceiling From Chasing Noise
+
+Floor and ceiling should describe a player's likely performance range when he plays his expected role. They should not be interpreted as the worst and best games of the player's career.
+
+Backtests should tag outliers separately:
+
+- Injury exit.
+- Playoff safety or benching.
+- Role loss.
+- Normal-role bad game.
+- Normal-role spike game.
+- New-role spike game.
+
+Do not adjust the core median or range because of short-term scoring misses alone. If usage and availability are intact, hold the projection and lower confidence or add a watch note. If the miss comes with changed snaps, routes, touches, attempts, injury status, or team context, update the role/health/context factors.
+
+Rule of thumb:
+
+```text
+one bad game with normal role = variance
+two bad games with normal role = watch trend, hold projection
+bad game with role or health change = update projection inputs
+above-ceiling game with normal role = spike outcome
+above-ceiling game with new role = possible projection upgrade
+```
+
 ### Step 5: Add Confidence Beside The Range
 
 Every floor/ceiling output should include confidence.

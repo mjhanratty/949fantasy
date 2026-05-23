@@ -469,11 +469,23 @@ Core functions:
 - Show bench.
 - Show projected team total.
 - Show floor, median, and ceiling lineup totals.
+- Show median, floor, and ceiling as alternative lineup scenarios, not as one guaranteed answer.
 - Show lineup lift if optimized.
 - Compare current lineup to best projected lineup.
+- Compare current lineup to the best median lineup, best floor lineup, and best ceiling lineup when they differ.
 - Support swap recommendations by slot.
 - Highlight regret-risk cases where a strong bench option exists.
 - Show projected opponent total for context.
+
+Lineup optimization should be honest about uncertainty.
+
+The median lineup is the default recommendation because it represents the most likely outcome. The floor lineup is the safer alternative when the user is already favored, protecting against downside and fragile players. The ceiling lineup is the chase alternative when the user is projected behind or needs a high-variance outcome. Do not present floor or ceiling as predictions that should happen; present them as scenario-aware alternatives.
+
+The UI should make it clear when the same lineup is optimal across all three scenarios. If the median lineup gains only a tiny number of points but lowers the floor meaningfully, the app should prefer a "no move" or "only if chasing ceiling" recommendation.
+
+Floor and ceiling labels should represent likely range, not absolute worst and best possible outcomes. If a player falls below floor because of an injury exit, benching, playoff safety, or another disrupted-role event, tag the week as an outlier instead of immediately crushing the player's forward projection. If a player clears ceiling with normal usage, tag it as a spike outcome; if the spike came from a real role change, then the next projection can move.
+
+The lineup UI should not chase one or two noisy scoring misses. It should hold the recommendation when role, snaps, usage, and availability are intact, while lowering confidence or adding a watch note if the misses repeat.
 
 Position slots must adapt to league settings.
 
@@ -481,7 +493,15 @@ Required metrics:
 
 - Current lineup projected points.
 - Optimized lineup projected points.
+- Current lineup median.
+- Current lineup floor.
+- Current lineup ceiling.
+- Optimized median lineup total.
+- Optimized floor lineup total.
+- Optimized ceiling lineup total.
 - Lineup lift.
+- Floor lift.
+- Ceiling lift.
 - Start confidence.
 - Matchup grade.
 - Risk label.
