@@ -6,6 +6,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 |----------|---------|
 | [working-brief.md](./working-brief.md) | Mission, brand, handoff index |
 | [workbook-analysis-notes.md](./workbook-analysis-notes.md) | Excel `Fantasy Rankings` formulas, value grades, floor/ceiling audit, rookie model |
+| [player-value-modeling.md](./player-value-modeling.md) | Position-agnostic value model, preseason vs pace, fragile value, QB validation slice |
 | [v1-stack.md](./v1-stack.md) | Stack, Supabase, providers, schema |
 | [vercel-env-plan.md](./vercel-env-plan.md) | **Vercel + `.env.local`** priorities (V0 RapidAPI, feature flags, Supabase) |
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
@@ -42,13 +43,13 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 - **GM / Coach architecture:** [evaluator-layering-spec.md](./evaluator-layering-spec.md) — data → specialist evaluators → consensus → risk → AI explanation (not prompt-only); ops/caching in [coach-gm-cache-weekly-ops.md](./coach-gm-cache-weekly-ops.md)
 - **Draft / GM:** board, simulator, 7 bands, ticker, queue, alerts, value grades — see piping handoff + page spec + draft engine
 - **Coach:** advisory only; Insights, scenarios, Q&A — no auto lineup submit
-- **Metrics / projections:** [metrics-glossary.md](./metrics-glossary.md); workbook lineage in [workbook-analysis-notes.md](./workbook-analysis-notes.md) (70% hit-rate target; current bands ~6–23% on audit)
+- **Metrics / projections:** [metrics-glossary.md](./metrics-glossary.md); value modeling in [player-value-modeling.md](./player-value-modeling.md); workbook lineage in [workbook-analysis-notes.md](./workbook-analysis-notes.md)
 
 ## Sync vendored docs
 
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
-for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops \
+for f in working-brief workbook-analysis-notes player-value-modeling v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops \
   data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
