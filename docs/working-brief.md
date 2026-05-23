@@ -41,6 +41,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-localhost-rapidapi-notes.md`: local Next.js scaffold status, RapidAPI route test notes, and remaining `.env.local` blocker for live NFL data.
 - `949fantasy-coach-gm-cache-weekly-ops.md`: Coach/GM cache strategy, weekly Value Score refresh cadence, manual waiver paste fallback, GM simulator recap requirements, and SEO/content operations notes.
 - `949fantasy-player-value-modeling.md`: position-agnostic player value modeling handoff, current QB validation slice, baseline pool rules, fragile value concept, and next model-layer requirements.
+- `949fantasy-games-feed-handoff.md`: Games surface data contract, top player selection rules, refresh cadence, and low-API cache strategy.
 
 ## Current HTML View Inventory
 

@@ -11,6 +11,8 @@ Claude owns visual/UI exploration. Cursor should preserve the existing layout in
 
 Related update: see `949fantasy-coach-gm-cache-weekly-ops.md` for the Coach/GM cache plan, weekly Value Score refresh cadence, manual waiver paste fallback, GM simulator recap requirements, and SEO/content generation implications.
 
+Games update: see `949fantasy-games-feed-handoff.md` for the planned Games surface, top QB/RB/receiver selection rules, live/cached game feed contract, and low-API refresh strategy.
+
 ## Current HTML / React Framing Read
 
 The supplied `949Fantasy (2).zip` contains the current view code:
