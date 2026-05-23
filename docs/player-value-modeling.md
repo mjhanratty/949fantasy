@@ -347,14 +347,19 @@ Weather and venue priors to test:
 | --- | --- |
 | Rain | Shorter passing routes, lower catch depth, more run/YAC emphasis |
 | Snow | Lower catch efficiency, more run/YAC emphasis, higher broken-play volatility |
+| Extreme cold, 20 F or below | Do not grade like a normal outdoor game; downgrade catch/timing efficiency, raise volatility, and favor rushing/YAC context |
 | Cold | Catch rates can fall; tackling may degrade late; warm-state teams may underperform outdoors after Oct. 31 |
 | Heat | More fourth-quarter fatigue and broken-play upside |
 | Humidity | Can hurt cold-weather teams early in the season |
 | Dome or indoor team outdoors in cold | Possible passing efficiency and timing penalty |
 | Outdoor cold or wind | Passing depth and accuracy penalty; rushing/QB legs can become more valuable |
 | Wet field | More missed tackles, but also more ball-security risk |
+| West Coast team traveling East for early kickoff | Possible offensive timing and efficiency penalty |
+| Europe/international game | Treat as an environment outlier; lower confidence and consider under/slow-start risk |
 
 These should start as explicit priors with conservative weights, then be backtested before becoming strong projection modifiers. The model should report them as context notes even when the adjustment is small.
+
+Environment outliers should be handled separately from ordinary home/away or roof adjustments. A 20-degree outdoor game, a transcontinental early kickoff, or a Europe game should not be graded as if it were a normal 65-degree 1:00 PM local kickoff. These events can move projection, widen weekly range, and lower confidence while still keeping the season range reasonable.
 
 The index should be position-aware:
 

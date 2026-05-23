@@ -303,6 +303,41 @@ Type:
 
 - deterministic
 
+Notes:
+
+949Fantasy should derive its own matchup/environment index instead of depending on DVOA alone.
+
+Initial feature groups:
+
+- Defensive efficiency by opponent and position.
+- Pass rush, sacks, pressure, turnovers, red-zone defense, explosive plays allowed.
+- Venue: home/away, indoor/outdoor, roof, surface, travel, time zone.
+- Weather: temperature, wind, rain, snow, humidity, heat.
+- Team climate fit: warm-state team in cold outdoor game after Oct. 31, indoor team outside in cold, cold-weather team in humid September conditions.
+- Player archetype fit: rushing QB, pocket QB, YAC-heavy WR, deep threat WR, bellcow RB, committee RB.
+
+Weather priors should be stored as explainable modifiers and backtested before receiving strong weights:
+
+- Rain can shorten passing routes and shift value toward YAC/run plays.
+- Snow and wet fields can reduce catch efficiency while increasing missed tackles and broken-play volatility.
+- Extreme cold, roughly 20 F or below, should be treated as an environment outlier rather than a normal weather adjustment.
+- Cold can hurt catch rates and timing, especially for warm-state or indoor teams outdoors.
+- Heat and humidity can create late-game fatigue and broken-play upside.
+- Wind should penalize deep passing and kicking more than short-area/YAC profiles.
+- West Coast teams traveling East for early kickoffs should receive a travel/timing context flag.
+- Europe/international games should receive an environment-outlier flag, lower confidence, and possible under/slow-start risk.
+
+Do not hide these as magic numbers. Coach should be able to explain them as small context edges or risks.
+
+Environment outlier outputs:
+
+- `environment_outlier_flag`
+- `weather_risk_reason`
+- `travel_risk_reason`
+- `confidence_adjustment`
+- `projection_adjustment`
+- `range_width_adjustment`
+
 ### `market_consensus`
 
 Purpose:

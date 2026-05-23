@@ -777,6 +777,8 @@ These are the data connections Codex/user will build or configure as needed.
   - Do not require external DVOA.
   - Include defensive efficiency, pass rush, turnovers, red-zone defense, venue, weather, climate-fit, and player-archetype modifiers.
   - Weather priors should remain explainable and conservative until backtested.
+  - Treat 20 F or colder outdoor games, major wind/rain/snow, West Coast to East Coast early kickoffs, and Europe/international games as environment outliers.
+  - Environment outliers may move projection, widen weekly range, and lower confidence, but should not inflate season floor/ceiling.
 - News provider:
   - SportsDataIO first.
   - External source aggregation later if needed.

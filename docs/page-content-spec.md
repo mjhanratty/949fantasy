@@ -485,6 +485,8 @@ The UI should make it clear when the same lineup is optimal across all three sce
 
 Floor and ceiling labels should represent likely range, not absolute worst and best possible outcomes. If a player falls below floor because of an injury exit, benching, playoff safety, or another disrupted-role event, tag the week as an outlier instead of immediately crushing the player's forward projection. If a player clears ceiling with normal usage, tag it as a spike outcome; if the spike came from a real role change, then the next projection can move.
 
+The UI should expose environment outliers when they materially affect a lineup call. Examples: 20 F or colder outdoor games, major wind/rain/snow, hot/humid fatigue games, West Coast teams traveling East for early kickoffs, and Europe/international games. These should show as confidence/risk context beside the median/floor/ceiling rather than being hidden in the score.
+
 Season floor and ceiling should be tighter than weekly floor and ceiling. Do not show season ceiling as the sum of every weekly ceiling; that overstates what is likely across a full season. Season ranges should use the player's historical season profile, games played, role security, and availability context.
 
 The lineup UI should not chase one or two noisy scoring misses. It should hold the recommendation when role, snaps, usage, and availability are intact, while lowering confidence or adding a watch note if the misses repeat.
