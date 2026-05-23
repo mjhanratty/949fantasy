@@ -9,6 +9,8 @@ This document tells Cursor what data contracts, API routes, fallback states, and
 
 Claude owns visual/UI exploration. Cursor should preserve the existing layout intent and wire the views to typed data contracts. Codex owns product logic, metrics, schemas, provider strategy, scoring methodology, and Vercel/Supabase data connections.
 
+Related update: see `949fantasy-coach-gm-cache-weekly-ops.md` for the Coach/GM cache plan, weekly Value Score refresh cadence, manual waiver paste fallback, GM simulator recap requirements, and SEO/content generation implications.
+
 ## Current HTML / React Framing Read
 
 The supplied `949Fantasy (2).zip` contains the current view code:

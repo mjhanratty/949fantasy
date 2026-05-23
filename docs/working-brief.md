@@ -39,6 +39,7 @@ When future page breakdowns include ownership labels, Codex should focus on the 
 - `949fantasy-vercel-env-plan.md`: prioritized Vercel environment variable plan for V0 testing, free NFL data, Supabase, Coach/GM, and V1 provider integrations.
 - `949fantasy-workbook-analysis-notes.md`: workbook-specific analysis of `Fantasy Rankings`, value grading, current floor/ceiling formulas, validation gaps, and production model requirements.
 - `949fantasy-localhost-rapidapi-notes.md`: local Next.js scaffold status, RapidAPI route test notes, and remaining `.env.local` blocker for live NFL data.
+- `949fantasy-coach-gm-cache-weekly-ops.md`: Coach/GM cache strategy, weekly Value Score refresh cadence, manual waiver paste fallback, GM simulator recap requirements, and SEO/content operations notes.
 
 ## Current HTML View Inventory
 

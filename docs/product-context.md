@@ -10,6 +10,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [vercel-env-plan.md](./vercel-env-plan.md) | **Vercel + `.env.local`** priorities (V0 RapidAPI, feature flags, Supabase) |
 | [page-content-spec.md](./page-content-spec.md) | Screens, GM, Coach |
 | [cursor-piping-handoff.md](./cursor-piping-handoff.md) | API contracts, franchise modes |
+| [coach-gm-cache-weekly-ops.md](./coach-gm-cache-weekly-ops.md) | Coach/GM cache layers, weekly Value Score ops, manual waiver fallback |
 | [data-source-matrix.md](./data-source-matrix.md) | V0/V1/V1.1/V2 data sources |
 | [metrics-glossary.md](./metrics-glossary.md) | Metric names, formulas |
 | [draft-market-engine.md](./draft-market-engine.md) | GM/Coach engine |
@@ -38,7 +39,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 ## Implementation snapshot
 
 - **Franchise modes:** `connected_league` · `manual_draft_room` · `manual_user_roster` · `demo_or_empty`
-- **GM / Coach architecture:** [evaluator-layering-spec.md](./evaluator-layering-spec.md) — data → specialist evaluators → consensus → risk → AI explanation (not prompt-only)
+- **GM / Coach architecture:** [evaluator-layering-spec.md](./evaluator-layering-spec.md) — data → specialist evaluators → consensus → risk → AI explanation (not prompt-only); ops/caching in [coach-gm-cache-weekly-ops.md](./coach-gm-cache-weekly-ops.md)
 - **Draft / GM:** board, simulator, 7 bands, ticker, queue, alerts, value grades — see piping handoff + page spec + draft engine
 - **Coach:** advisory only; Insights, scenarios, Q&A — no auto lineup submit
 - **Metrics / projections:** [metrics-glossary.md](./metrics-glossary.md); workbook lineage in [workbook-analysis-notes.md](./workbook-analysis-notes.md) (70% hit-rate target; current bands ~6–23% on audit)
@@ -47,7 +48,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
-for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff \
+for f in working-brief workbook-analysis-notes v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops \
   data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
