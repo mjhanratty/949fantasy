@@ -1,7 +1,7 @@
 # 949Fantasy Localhost RapidAPI Notes
 
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-localhost-rapidapi-notes.md`
-> **In-repo paths:** `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts`, `app/api/nfl/teams/route.ts`, `app/api/nfl/roster-stats/route.ts`, `app/(dev)/data-lab/page.tsx`.
+> **In-repo paths:** `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts`, `app/api/nfl/teams/route.ts`, `app/api/nfl/roster-stats/route.ts`.
 
 
 ## Current Status
@@ -34,8 +34,7 @@ Implemented / restored:
   - `NFL Live · {team count}`
   - `NFL Mock`
 - Server-only RapidAPI route: `app/api/nfl/teams/route.ts`
-- Sleeper 2025 roster stats: `app/api/nfl/roster-stats/route.ts` → merges into demo `ROSTER_IDS` only
-- Helpers: `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts` (see [v0-roster-stats-bridge.md](./v0-roster-stats-bridge.md)), `lib/sleeper.ts`, `lib/demo-roster.ts`
+- RapidAPI fetch/normalization helper: `lib/rapidapi.ts`, `lib/sleeper.ts`, `lib/demo-roster.ts`
 
 Verified:
 
