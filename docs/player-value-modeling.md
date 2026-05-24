@@ -374,6 +374,10 @@ For every position test, track:
 
 - exact grade accuracy.
 - within-one-grade accuracy.
+- season within-tolerance accuracy.
+- season absolute point error.
+- season percent error.
+- weekly range coverage.
 - average absolute value error.
 - overprojection rate.
 - underprojection rate.
@@ -384,6 +388,20 @@ For every position test, track:
 - injury-excluded accuracy.
 - injury-included accuracy.
 - player-level volatility.
+
+Season accuracy should not mean predicting the exact final point total. It should mean the actual season landed inside an accepted tolerance around the projected total.
+
+Example:
+
+```txt
+projected_total = 400
+accepted_tolerance = +/- 15%
+accurate_range = 340 to 460
+```
+
+For high-confidence season projections, also track point error because a 30-point miss over 17 games is less than two fantasy points per week. Example: a RB projected for 215 who finishes between 185 and 245 should be treated as a healthy forecast unless the model claimed a much tighter confidence band.
+
+Keep this separate from weekly floor/ceiling coverage. Weekly projections are noisier; season projections should be evaluated on total-point tolerance, percent error, and whether the player stayed inside the season floor/ceiling profile.
 
 ## Lineup Optimization Translation
 

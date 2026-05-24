@@ -313,6 +313,8 @@ Floor and ceiling must be player-specific. Do not use one position-wide QB/RB/WR
 
 Weekly and season floor/ceiling are separate calculations. Do not calculate a season ceiling by summing every weekly ceiling, and do not calculate a season floor by summing every weekly floor. Weekly ranges can be loose because individual games are noisy; season ranges should be tighter and anchored to the player's historical season profile.
 
+Season accuracy should be reported as within-tolerance accuracy, not exact-total accuracy. For example, if a player is projected for 400 points, a +/- 15% band means 340 to 460 is considered inside the accepted season projection range. Also track raw point error and percent error. A 30-point miss over 17 games is less than two points per week and can still be a healthy forecast.
+
 Floor and ceiling are likely-performance bands. They are not absolute career-low and career-high scores. Cursor should preserve outlier context in model outputs so Coach can distinguish:
 
 - below-floor injury/early-exit games.

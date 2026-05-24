@@ -151,6 +151,13 @@ Outputs:
 
 - median projection
 
+Evaluation:
+
+- Season accuracy should use within-tolerance accuracy, raw point error, and percent error.
+- Do not treat exact final-point prediction as the primary success metric.
+- Example: projected 400 points with +/- 15% accepted tolerance means 340 to 460 is inside range.
+- Weekly projection/range coverage should be tracked separately from season total accuracy.
+
 Type:
 
 - deterministic

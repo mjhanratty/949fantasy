@@ -312,16 +312,28 @@ adjusted_ceiling = ceiling_points * (1 + upside_volatility_adjustment)
 
 This lets stable players keep tight ranges while volatile players show honest uncertainty.
 
-### Step 4: Calibrate To 70% Without Making Ranges Useless
+### Step 4: Calibrate Season Accuracy Without Making Ranges Useless
 
-The goal is not to force every player into a massive band. The goal is to make the range trustworthy.
+The goal is not exact-point accuracy. Users understand these are predictions. For season-long projections, a healthy accuracy target is whether actual season points land inside a tolerance band around the predicted total.
+
+Example interpretation:
+
+```text
+predicted_total = 400
+healthy_band = +/- 15%
+accurate_result = 340 to 460
+```
+
+For tighter model evaluation, also track absolute point error. A +/- 30 point miss over 17 games is less than two points per week, which can be a healthy prediction depending on player tier and position.
+
+The goal is not to force every player into a massive band. The goal is to make the range trustworthy and useful.
 
 Use a calibration loop:
 
 1. Backtest by season and position.
 2. Exclude or separately tag major availability events, such as season-ending injuries, suspensions, and players who lost their role for non-performance reasons.
-3. Measure whether actual season points landed inside the model range.
-4. Tune range multipliers by position and archetype until each group approaches 70% coverage.
+3. Measure whether actual season points landed inside the model's accepted tolerance band, such as +/- 15% or a position-specific point band.
+4. Tune range multipliers by position and archetype until the model reaches the desired within-band rate without making the displayed range useless.
 5. Keep a maximum range-width guardrail so the UI does not show meaningless ranges.
 
 Suggested guardrails:

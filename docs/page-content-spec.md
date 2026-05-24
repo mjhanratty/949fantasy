@@ -489,6 +489,8 @@ The UI should expose environment outliers when they materially affect a lineup c
 
 Season floor and ceiling should be tighter than weekly floor and ceiling. Do not show season ceiling as the sum of every weekly ceiling; that overstates what is likely across a full season. Season ranges should use the player's historical season profile, games played, role security, and availability context.
 
+Season accuracy should be shown as a tolerance concept, not exact-number accuracy. Users should understand that a projection can be good even when it misses the exact total. For example, a player projected at 400 points finishing within roughly +/- 15% is a useful forecast, and a 30-point miss over 17 weeks is less than two points per week.
+
 The lineup UI should not chase one or two noisy scoring misses. It should hold the recommendation when role, snaps, usage, and availability are intact, while lowering confidence or adding a watch note if the misses repeat.
 
 Position slots must adapt to league settings.
