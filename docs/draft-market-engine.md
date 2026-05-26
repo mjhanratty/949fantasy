@@ -975,7 +975,7 @@ Normalize every source into the same units:
 - 949 rank.
 - Tier.
 - Bye week.
-- SOS score.
+- SOS rank from opponents' combined record, with one NFL team per rank.
 - Boom probability.
 - Bust probability.
 - Neutral / expected probability.
@@ -983,6 +983,9 @@ Normalize every source into the same units:
 - Injury status.
 - Risk label.
 - 949 Value grade.
+- Draft Stock number for pick-level scoring and draft spend charts.
+- Pick Price label for user-facing ADP delta, such as `Low Steal +2` or `Low Reach -3`.
+- EOS Role projection, such as `RB1`, `RB2`, `FLEX`, or `BENCH`.
 - Source confidence.
 - Snapshot timestamp.
 

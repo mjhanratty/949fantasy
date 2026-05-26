@@ -212,7 +212,7 @@ Value Grade should not change during a draft unless the underlying player projec
 
 ### Draft Stock
 
-Live draft-context grade.
+Live draft-context score/grade.
 
 It should change as the draft progresses because player acquisition cost changes.
 
@@ -233,6 +233,12 @@ Draft Stock should be driven by:
 - ADP.
 - platform rank.
 - expected draft window.
+- pick price.
+- roster context.
+- SOS.
+- risk.
+
+In user-facing pick tooltips, use `Draft Stock` for the numeric pick score and reserve `Value` for the 949 A+ to F player value grade.
 - survival probability to next user pick.
 - positional scarcity.
 - tier cliffs.

@@ -96,9 +96,9 @@ The application should render from 949 internal APIs, not directly from third-pa
 | Statistics / Performance | Same as Analytics | Same as Analytics |
 | Player Trends | Player weekly actuals + projections | Floor/ceiling model + game context |
 | Player Tape | Projection + final actual + floor/ceiling | Opponent, venue, weather, injury context |
-| Draft Rankings | 949 rankings + player pool | Platform ranks, ADP, bye week, SOS, risk, boom/bust probabilities, neutral/expected probability, YOY trend, value grade, full-season projections |
-| Draft Board | Draft settings + player pool + platform rank | Full platform rank snapshots + GM recommendations |
-| Draft Score | Draft picks + 949 draft scoring | ADP/platform rank + full league draft context |
+| Draft Rankings | 949 rankings + player pool | Platform ranks, ADP, bye week, team-unique SOS rank from opponents' combined record, risk, boom/bust probabilities, neutral/expected probability, YOY trend, value grade, full-season projections |
+| Draft Board | Draft settings + player pool + platform rank | Full platform rank snapshots + GM recommendations, pick price, EOS role projection |
+| Draft Score | Draft picks + 949 draft scoring | Draft Stock number, ADP/platform rank + full league draft context |
 | GM Sidebar | Draft room state + 949 GM engine | Platform rank, ADP, simulation, roster construction, run alerts, queue status |
 | Draft Simulator | Player pool + computer drafter rules | Platform ADP/rank + 949 recommendations + saved results |
 

@@ -276,6 +276,9 @@ Should return:
 - platform rank where available.
 - market discount.
 - SOS.
+- Draft Stock.
+- Pick Price.
+- EOS Role.
 - boom probability.
 - bust probability.
 - neutral / expected probability.

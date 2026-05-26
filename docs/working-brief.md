@@ -283,10 +283,14 @@ Derived model outputs:
 - Risk label.
 - Matchup grade.
 - Strength of schedule score.
+- Strength of schedule rank.
 - Rest-of-season projection.
 - Weekly movement delta.
 - YOY trend.
 - Draft availability probability.
+- Draft Stock.
+- Pick Price.
+- EOS Role.
 - Draft score.
 - Spend efficiency grade.
 - Value over next available.

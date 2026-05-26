@@ -213,6 +213,14 @@ Draft Rankings table columns:
 - YOY Trend.
 - Value.
 
+Draft score/player tooltip fields:
+
+- Band.
+- Draft Stock.
+- Pick Price.
+- EOS Role.
+- SOS.
+
 Main grid:
 
 - Three columns: left GM, center Draft Board, right Your Team

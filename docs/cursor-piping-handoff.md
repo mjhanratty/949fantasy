@@ -497,11 +497,14 @@ Needs:
 - Player: name, position, team, and weekly matchup.
 - Proj (Total): projected fantasy points for the full season.
 - Bye: NFL bye week.
-- SOS: strength of schedule score, with higher meaning easier projected matchups.
+- SOS: strength of schedule rank based on opponents' combined record. `1` is hardest, `32` is easiest, and each NFL team occupies one rank.
 - Risk: uncertainty built into the player's outlook.
 - Boom / Bust: upside vs. downside range based on projected weekly outcomes. `51 / 16` means 51% boom, 16% bust, and 33% neutral/expected.
 - YOY Trend: recent seasons compared against this year's projection.
 - Value: 949 value grade based on projected return versus expected draft cost.
+- Draft Stock: numeric pick score for the draft spend chart and pick-level evaluation. Higher means the model liked the selected player at that specific draft cost.
+- Pick Price: user-facing ADP delta phrase, such as `Low Steal +2`, `Expected 0`, or `Low Reach -3`.
+- EOS Role: end-of-season roster role projection, such as `RB1`, `RB2`, `FLEX`, or `BENCH`.
 - Scoring type.
 - Platform filter.
 
