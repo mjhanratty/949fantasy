@@ -1302,6 +1302,7 @@ Use consistent meaning:
 | Position metrics donut | Cumulative points by position for team/league/bench |
 | Projections page | Weekly projections, actuals, league averages |
 | Rankings | Weekly projections, ROS projections, tiers, value score, ADP, matchup data, risk/boom-bust, scoring format |
+| Draft Rankings | Draft pool, rank, player/team/matchup, Proj (Total), bye, SOS, risk, boom/bust/neutral probabilities, YOY trend, 949 Value grade, scoring format |
 | Performance blocks | Season points, projected totals, league position totals |
 | Player trend chart | Player weekly actuals, floor, ceiling, future projections |
 | Player Tape | Player weekly actuals, projected points, floor/ceiling, projection error, opponent, game conditions |

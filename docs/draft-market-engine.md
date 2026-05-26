@@ -966,7 +966,7 @@ Normalize every source into the same units:
 - Player ID.
 - Position.
 - Team.
-- Projection.
+- Proj (Total).
 - Floor.
 - Ceiling.
 - ADP.
@@ -974,8 +974,15 @@ Normalize every source into the same units:
 - Platform rank.
 - 949 rank.
 - Tier.
+- Bye week.
+- SOS score.
+- Boom probability.
+- Bust probability.
+- Neutral / expected probability.
+- YOY trend.
 - Injury status.
 - Risk label.
+- 949 Value grade.
 - Source confidence.
 - Snapshot timestamp.
 

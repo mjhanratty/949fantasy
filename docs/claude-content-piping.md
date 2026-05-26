@@ -271,9 +271,15 @@ Use for draft content.
 Should return:
 
 - player value grade.
+- Proj (Total).
 - ADP.
 - platform rank where available.
 - market discount.
+- SOS.
+- boom probability.
+- bust probability.
+- neutral / expected probability.
+- YOY trend.
 - draft stock.
 - fragile value flag.
 - GM interpretation.

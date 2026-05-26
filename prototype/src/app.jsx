@@ -6,6 +6,10 @@ const { useState, useEffect, useRef } = React;
 const NAV = [
   { id: "analytics", label: "Analytics" },
   { id: "lineup",    label: "Start / Sit" },
+  { id: "draft",     label: "Draft", subs: [
+    { id: "board",    label: "Draft Board" },
+    { id: "rankings", label: "Rankings (Pre-Season)" },
+  ]},
   { id: "metrics",   label: "Metrics",    subs: [
     { id: "weekly",    label: "Weekly Points" },
     { id: "standings", label: "Standings" },
@@ -16,7 +20,7 @@ const NAV = [
     { id: "trends",      label: "Player Trends" },
   ]},
   { id: "projections", label: "Projections", subs: [
-    { id: "tape",        label: "Player Tape (Candles)" },
+    { id: "tape",        label: "Player Tape" },
     { id: "rankings",    label: "Player Breakdown" },
     { id: "lineup-opt",  label: "Lineup Optimizer" },
   ]},
@@ -27,7 +31,6 @@ const NAV = [
 // ============================================================
 function TopNav({ current, sub, onNavigate, collapsed, setCollapsed }) {
   const [openDrop, setOpenDrop] = useState(null);
-  const [dataStatus, setDataStatus] = useState(window.NFL_DATA_STATUS || { status: "idle", message: "Prototype mock data" });
   const dropRef = useRef(null);
 
   useEffect(() => {
@@ -37,20 +40,6 @@ function TopNav({ current, sub, onNavigate, collapsed, setCollapsed }) {
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
-
-  useEffect(() => {
-    function onStatus(event) {
-      setDataStatus(event.detail);
-    }
-
-    window.addEventListener("nfl-data-status", onStatus);
-    return () => window.removeEventListener("nfl-data-status", onStatus);
-  }, []);
-
-  const dataTone =
-    dataStatus.status === "live" ? "var(--mint)" :
-    dataStatus.status === "loading" ? "var(--gold)" :
-    "var(--slate)";
 
   return (
     <header style={{
@@ -170,30 +159,6 @@ function TopNav({ current, sub, onNavigate, collapsed, setCollapsed }) {
 
         {/* Right side */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div title={dataStatus.message} style={{
-            display: "inline-flex", alignItems: "center", gap: 7,
-            padding: "7px 10px", borderRadius: 999,
-            border: "1px solid var(--green-600)",
-            background: "rgba(22,56,36,0.35)",
-          }}>
-            <span style={{
-              width: 7, height: 7, borderRadius: "50%",
-              background: dataTone,
-              boxShadow: dataStatus.status === "live" ? "0 0 10px rgba(149,249,174,0.65)" : "none"
-            }} />
-            <span className="mono" style={{
-              fontSize: 10, color: dataTone, letterSpacing: "0.08em",
-              textTransform: "uppercase", whiteSpace: "nowrap"
-            }}>
-              {dataStatus.status === "live" && dataStatus.rosterStats === "live"
-                ? `2025 Live · ${dataStatus.rosterMerged || 0} roster`
-                : dataStatus.status === "live"
-                  ? `NFL Live · ${dataStatus.teamsLoaded}`
-                  : dataStatus.status === "loading"
-                    ? "NFL Loading"
-                    : "NFL Mock"}
-            </span>
-          </div>
           <button title="Notifications" style={{
             background: "transparent", border: "1px solid var(--green-600)",
             borderRadius: 8, padding: 8, cursor: "pointer", color: "var(--slate)",
@@ -290,6 +255,8 @@ function App() {
         {view === "metrics"     && <div data-screen-label="03 Metrics">      <MetricsView    tab={metricsTab} setTab={(t) => navigate("metrics", t)} onSelectPlayer={selectPlayer} /></div>}
         {view === "statistics"  && <div data-screen-label="04 Statistics">   <StatisticsView tab={statsTab}    setTab={(t) => navigate("statistics", t)} onSelectPlayer={selectPlayer} /></div>}
         {view === "lineup"      && <div data-screen-label="05 Start Sit">    <LineupView     onSelectPlayer={selectPlayer} /></div>}
+        {view === "draft" && sub === "rankings" && <div data-screen-label="06 Draft Rankings"><DraftRankingsView onSelectPlayer={selectPlayer} /></div>}
+        {view === "draft" && sub !== "rankings" && <div data-screen-label="06 Draft Board"><DraftView      onSelectPlayer={selectPlayer} /></div>}
         {view === "projections" && sub === "tape" && <div data-screen-label="06 Projections Tape"><PlayerTapeView onSelectPlayer={selectPlayer} /></div>}
         {view === "projections" && sub !== "tape" && <div data-screen-label="06 Projections">  <RankingsView   onSelectPlayer={selectPlayer} /></div>}
         {view === "rankings"    && <div data-screen-label="06 Projections">  <RankingsView   onSelectPlayer={selectPlayer} /></div>}
@@ -330,6 +297,7 @@ function Footer({ onNavigate }) {
             { l: "Metrics",     n: "metrics"    },
             { l: "Statistics",  n: "statistics" },
             { l: "Start / Sit", n: "lineup"     },
+            { l: "Draft",       n: "draft", s: "board" },
             { l: "Projections", n: "projections"},
           ]},
           { title: "Resources", items: [{ l: "Methodology" }, { l: "Glossary" }, { l: "API" }, { l: "Changelog" }] },
@@ -340,7 +308,7 @@ function Footer({ onNavigate }) {
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
               {col.items.map(item => (
                 <li key={item.l}>
-                  <a href="#" onClick={e => { e.preventDefault(); if (item.n && onNavigate) onNavigate(item.n); }}
+                  <a href="#" onClick={e => { e.preventDefault(); if (item.n && onNavigate) onNavigate(item.n, item.s || null); }}
                      style={{ fontSize: 13, color: "var(--slate)", textDecoration: "none", cursor: "pointer" }}>{item.l}</a>
                 </li>
               ))}

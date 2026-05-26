@@ -19,12 +19,13 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 | [data-source-matrix.md](./data-source-matrix.md) | V0/V1/V1.1/V2 data sources |
 | [metrics-glossary.md](./metrics-glossary.md) | Metric names, formulas |
 | [draft-market-engine.md](./draft-market-engine.md) | GM/Coach engine |
+| [draft-simulator-cursor-prompt.md](./draft-simulator-cursor-prompt.md) | Prototype Draft tab build prompt (GM board, simulator, live entry) |
 | [evaluator-layering-spec.md](./evaluator-layering-spec.md) | Shared GM/Coach evaluator layers, consensus, AI boundaries |
 | [draft-theory-source-notes.md](./draft-theory-source-notes.md) | Draft research → lessons |
 | [ia-routes.md](./ia-routes.md) | Routes |
 | [localhost-rapidapi-notes.md](./localhost-rapidapi-notes.md) | V0 RapidAPI + Sleeper stats hydration |
 | [v0-roster-stats-bridge.md](./v0-roster-stats-bridge.md) | Live 2025 points on fixed demo roster personas |
-| [design-reference.md](./design-reference.md) | `prototype/` shell |
+| [design-reference.md](./design-reference.md) | `prototype/` shell — includes **Draft** (`prototype/src/views/draft.jsx`) |
 
 ## Environment & hosting
 
@@ -55,7 +56,7 @@ Authoritative briefs live under `/Users/matthewhanratty/Documents/New project/`.
 ```bash
 DOCS="/Users/matthewhanratty/Documents/New project"
 for f in working-brief workbook-analysis-notes player-value-modeling v1-stack vercel-env-plan page-content-spec cursor-piping-handoff coach-gm-cache-weekly-ops games-feed-handoff claude-content-piping \
-  data-source-matrix metrics-glossary draft-market-engine evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
+  data-source-matrix metrics-glossary draft-market-engine draft-simulator-cursor-prompt evaluator-layering-spec draft-theory-source-notes localhost-rapidapi-notes; do
   cp "$DOCS/949fantasy-${f}.md" docs/${f}.md
 done
 for f in qb-grade-validation-12qb-summary qb-grade-validation-12qb qb-grade-validation-prototype; do

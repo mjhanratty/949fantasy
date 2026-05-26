@@ -493,15 +493,15 @@ Moved from Projections/Player Breakdown.
 Needs:
 
 - Draftable players.
-- 949 rank.
-- Position rank.
-- Platform rank.
-- ADP.
-- Projection.
-- Floor.
-- Ceiling.
-- Tier.
-- Risk.
+- Rank: overall player rank for the active scoring format.
+- Player: name, position, team, and weekly matchup.
+- Proj (Total): projected fantasy points for the full season.
+- Bye: NFL bye week.
+- SOS: strength of schedule score, with higher meaning easier projected matchups.
+- Risk: uncertainty built into the player's outlook.
+- Boom / Bust: upside vs. downside range based on projected weekly outcomes. `51 / 16` means 51% boom, 16% bust, and 33% neutral/expected.
+- YOY Trend: recent seasons compared against this year's projection.
+- Value: 949 value grade based on projected return versus expected draft cost.
 - Scoring type.
 - Platform filter.
 

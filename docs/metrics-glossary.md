@@ -523,6 +523,14 @@ Use this to suppress or soften red/yellow/green condition claims when history is
 
 ## Boom/Bust Metrics
 
+Draft Rankings should display this column as `Boom / Bust`. A row like `51 / 16` means:
+
+- `51%` chance the player lands in the boom outcome band.
+- `16%` chance the player lands in the bust outcome band.
+- `33%` neutral or expected outcome range.
+
+The three bands should sum to 100% conceptually, though the UI only displays the boom and bust numbers.
+
 ### Boom Probability
 
 Probability that a player significantly exceeds expectation.
@@ -558,6 +566,19 @@ bust_probability =
 Alternative:
 
 Use position-specific bust thresholds.
+
+### Neutral / Expected Probability
+
+Probability that a player lands between the boom and bust thresholds.
+
+Initial definition:
+
+```txt
+neutral_probability =
+  max(0, 1 - boom_probability - bust_probability)
+```
+
+This value is implied in Draft Rankings tooltips, not shown as a separate column.
 
 ### Risk Label
 
@@ -1263,13 +1284,14 @@ Build these first:
 13. Floor/Ceiling Hit Rate.
 14. Boom Probability.
 15. Bust Probability.
-16. Risk Label.
-17. Weekly Rank.
-18. Rest-Of-Season Rank.
-19. ADP Value Delta.
-20. Lineup Lift.
-21. Weekly Projection Delta.
-22. Game Environment Score.
-23. Waiver Wire Edge.
-24. Optimized Lineup Projection.
-25. Lineup Floor / Median / Ceiling.
+16. Neutral / Expected Probability.
+17. Risk Label.
+18. Weekly Rank.
+19. Rest-Of-Season Rank.
+20. ADP Value Delta.
+21. Lineup Lift.
+22. Weekly Projection Delta.
+23. Game Environment Score.
+24. Waiver Wire Edge.
+25. Optimized Lineup Projection.
+26. Lineup Floor / Median / Ceiling.

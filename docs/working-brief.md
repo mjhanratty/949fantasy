@@ -271,6 +271,7 @@ Core entities likely needed:
 Derived model outputs:
 
 - Projected points.
+- Projected season total.
 - Floor.
 - Median.
 - Ceiling.
@@ -278,10 +279,13 @@ Derived model outputs:
 - Positional value index.
 - Boom probability.
 - Bust probability.
+- Neutral / expected probability.
 - Risk label.
 - Matchup grade.
+- Strength of schedule score.
 - Rest-of-season projection.
 - Weekly movement delta.
+- YOY trend.
 - Draft availability probability.
 - Draft score.
 - Spend efficiency grade.

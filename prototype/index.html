@@ -118,6 +118,52 @@
     70% { box-shadow: 0 0 0 6px rgba(149,249,174,0); }
     100% { box-shadow: 0 0 0 0 rgba(149,249,174,0); }
   }
+
+  .help-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    cursor: help;
+  }
+  .help-pop {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 90;
+    width: min(280px, 70vw);
+    padding: 10px 12px;
+    border: 1px solid var(--green-600);
+    border-radius: 8px;
+    background: rgba(5,8,7,0.98);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.46);
+    color: var(--mint-soft);
+    font-family: "Sora", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.45;
+    text-transform: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-3px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+  }
+  .help-tip.align-end .help-pop {
+    right: 0;
+    left: auto;
+  }
+  .help-tip.side-top .help-pop {
+    top: auto;
+    bottom: calc(100% + 8px);
+  }
+  .help-tip:hover .help-pop,
+  .help-tip:focus-within .help-pop {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -138,6 +184,9 @@
 <script type="text/babel" src="src/views/rankings.jsx?v=v2-restored"></script>
 <script type="text/babel" src="src/views/player.jsx?v=v2-restored"></script>
 <script type="text/babel" src="src/views/lineup.jsx?v=v2-restored"></script>
+<script type="text/babel" src="src/views/draft-helpers.jsx?v=current-layout-1"></script>
+<script type="text/babel" src="src/views/draft-rankings.jsx?v=current-layout-1"></script>
+<script type="text/babel" src="src/views/draft.jsx?v=draft-gm-3"></script>
 <script type="text/babel" src="src/views/stadium-map.jsx?v=v2-restored"></script>
 <script type="text/babel" src="src/views/playertape.jsx?v=v2-restored"></script>
 <script type="text/babel" src="src/tweaks-panel.jsx?v=v2-restored"></script>
