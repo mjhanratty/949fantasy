@@ -151,6 +151,7 @@ function DraftView({ onSelectPlayer }) {
       draftScore: grade.score,
       draftGrade: grade.letter,
       draftGradeColor: grade.color,
+      teamCount,
       valueScore: window.seasonValueScore(enriched),
       modelScore: window.cfModelScore(enriched),
       sosScore: window.sosScore(enriched),
@@ -695,11 +696,36 @@ function BoardCard({
   );
 }
 
+const DRAFT_TILE_MIN_WIDTH = 132;
+const DRAFT_TILE_GAP = 6;
+
 function DraftBoardMode({ boardScrollRef, mode, players, teams, rosters, pickLog, userRoster, grade, gm, draftOrder, teamCount, rounds, queue, isUserTurn, simStarted, onDraft, onQueue, onQueueDrop, onSelectPlayer, rosterSlots }) {
+  const boardGridRef = React.useRef(null);
+  const [boardColumnCount, setBoardColumnCount] = React.useState(1);
+
+  React.useEffect(() => {
+    const grid = boardGridRef.current;
+    if (!grid) return;
+
+    function syncColumnCount() {
+      const width = grid.clientWidth || DRAFT_TILE_MIN_WIDTH;
+      const nextCount = Math.max(1, Math.floor((width + DRAFT_TILE_GAP) / (DRAFT_TILE_MIN_WIDTH + DRAFT_TILE_GAP)));
+      setBoardColumnCount(prev => prev === nextCount ? prev : nextCount);
+    }
+
+    syncColumnCount();
+    const observer = new ResizeObserver(syncColumnCount);
+    observer.observe(grid);
+    return () => observer.disconnect();
+  }, [mode]);
+
+  const visiblePlayers = React.useMemo(() => collapseFullyDraftedRows(players, boardColumnCount), [players, boardColumnCount]);
+  const clearedCount = players.length - visiblePlayers.length;
+  const isLeagueMode = mode === "league";
+
   if (mode === "live") return <LiveLeagueBoard teams={teams} rosters={rosters} />;
   if (mode === "picks") return <PicksRoundBoard pickLog={pickLog} draftOrder={draftOrder} teams={teams} teamCount={teamCount} rounds={rounds} />;
-  if (mode === "score") return <ScoreCardBoard userRoster={userRoster} grade={grade} gm={gm} pickLog={pickLog} rosterSlots={rosterSlots} />;
-  const isLeagueMode = mode === "league";
+  if (mode === "score") return <ScoreCardBoard userRoster={userRoster} grade={grade} gm={gm} pickLog={pickLog} rosterSlots={rosterSlots} teamCount={teamCount} />;
 
   return (
     <div
@@ -708,8 +734,13 @@ function DraftBoardMode({ boardScrollRef, mode, players, teams, rosters, pickLog
       onDrop={e => { e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if (id) onQueueDrop(id); }}
       style={{ padding: 12, maxHeight: 780, overflow: "auto", overscrollBehavior: "contain" }}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))", gap: 6 }}>
-        {players.map(player => (
+      {clearedCount > 0 && (
+        <div className="mono" style={{ marginBottom: 8, fontSize: 9, color: "var(--slate-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          Cleared {clearedCount} taken player{clearedCount === 1 ? "" : "s"} from completed board row{clearedCount === boardColumnCount ? "" : "s"}
+        </div>
+      )}
+      <div ref={boardGridRef} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))", gap: 6 }}>
+        {visiblePlayers.map(player => (
           <DraftPlayerTile
             key={player.id}
             player={player}
@@ -718,6 +749,7 @@ function DraftBoardMode({ boardScrollRef, mode, players, teams, rosters, pickLog
             onDraft={() => onDraft(player.id)}
             onQueue={(event) => { event.stopPropagation(); onQueue(player.id); }}
             onSelect={() => onSelectPlayer && !player.synthetic && onSelectPlayer(player)}
+            teamCount={teamCount}
           />
         ))}
       </div>
@@ -725,7 +757,33 @@ function DraftBoardMode({ boardScrollRef, mode, players, teams, rosters, pickLog
   );
 }
 
-function DraftPlayerTile({ player, queued, canDraft = true, onDraft, onQueue, onSelect }) {
+function collapseFullyDraftedRows(players, columnCount) {
+  if (!players.length || columnCount <= 1) return players;
+  let visible = players;
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    const next = [];
+
+    for (let i = 0; i < visible.length; i += columnCount) {
+      const row = visible.slice(i, i + columnCount);
+      const isFullRow = row.length === columnCount;
+      const allTaken = isFullRow && row.every(player => !!player.drafted);
+      if (allTaken) {
+        changed = true;
+      } else {
+        next.push(...row);
+      }
+    }
+
+    visible = next;
+  }
+
+  return visible;
+}
+
+function DraftPlayerTile({ player, queued, canDraft = true, onDraft, onQueue, onSelect, teamCount = 12 }) {
   const team = window.TEAMS[player.team] || { color: "#2A4A37", name: player.team };
   const isGone = !!player.drafted;
   const posColor = window.positionColor(player.pos);
@@ -793,7 +851,7 @@ function DraftPlayerTile({ player, queued, canDraft = true, onDraft, onQueue, on
       {/* Bottom row: ADP · proj · queue */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 7 }}>
         <span className="mono" style={{ color: "var(--slate)", fontSize: 9, letterSpacing: "0.04em" }}>
-          ADP <span style={{ color: "var(--mint-soft)" }}>{window.formatAdpPick(player.adp)}</span>
+          ADP <span style={{ color: "var(--mint-soft)" }}>{window.formatAdpPick(player.adp, teamCount)}</span>
           <span style={{ color: "var(--slate-dim)", margin: "0 4px" }}>·</span>
           <span style={{ color: "var(--mint)" }}>{player.adjusted.toFixed(1)}</span>
         </span>
@@ -849,7 +907,7 @@ function LiveLeagueBoard({ teams, rosters }) {
   );
 }
 
-function ScoreCardBoard({ userRoster, grade, gm, pickLog, rosterSlots }) {
+function ScoreCardBoard({ userRoster, grade, gm, pickLog, rosterSlots, teamCount }) {
   const [hoveredId, setHoveredId] = React.useState(null);
   const lineup = window.buildScoredLineup(userRoster, rosterSlots);
   const starters = lineup.filter(i => i.slot !== "BENCH").map(i => i.player);
@@ -903,9 +961,9 @@ function ScoreCardBoard({ userRoster, grade, gm, pickLog, rosterSlots }) {
             </div>
             <div className="mono" style={{ color: "var(--slate)", fontSize: 9, marginTop: 4 }}>{p.draft?.roundPick} · {p.draft?.selectedBand || p.valueLabel}</div>
             <div className="mono" style={{ color: "var(--slate-dim)", fontSize: 9, marginTop: 3 }}>
-              V {Math.round(p.draft?.valueScore || window.seasonValueScore(p))} · ADP {p.draft?.adpDelta >= 0 ? "+" : ""}{p.draft?.adpDelta || 0} · M {Math.round(p.draft?.modelScore || window.cfModelScore(p))} · SOS {window.scheduleEaseRank(p)}
+              Stock {Math.round(p.draft?.draftScore || window.draftStockGrade(p).score)} · {formatPickPrice(p.draft?.adpDelta || 0, p.draft?.selectedBand || p.valueLabel)} · {window.roleProjectionLabel(p)} · SOS {window.scheduleEaseRank(p)}
             </div>
-            {hoveredId === p.id && <ScorePlayerTooltip player={p} />}
+            {hoveredId === p.id && <ScorePlayerTooltip player={p} teamCount={teamCount} />}
           </div>
         ))}
       </div>
@@ -913,7 +971,7 @@ function ScoreCardBoard({ userRoster, grade, gm, pickLog, rosterSlots }) {
   );
 }
 
-function ScorePlayerTooltip({ player }) {
+function ScorePlayerTooltip({ player, teamCount = player.draft?.teamCount || 12 }) {
   const draftGrade = window.draftStockGrade(player);
   const adpDelta = player.draft?.adpDelta || 0;
   const deltaLabel = adpDelta > 0
@@ -921,39 +979,52 @@ function ScorePlayerTooltip({ player }) {
     : adpDelta < 0
       ? `${Math.abs(adpDelta)} before ADP (overpay)`
       : "at ADP";
-  const model = Math.round(player.draft?.modelScore || window.cfModelScore(player));
-  const value = Math.round(player.draft?.valueScore || window.seasonValueScore(player));
+  const role = window.roleProjectionLabel(player);
+  const stock = Math.round(player.draft?.draftScore || draftGrade.score);
   const sos = window.scheduleEaseRank(player);
+  const sosNote = window.scheduleStrengthNote(player);
   const band = player.draft?.selectedBand || player.valueLabel || "Expected";
+  const pickPrice = formatPickPrice(adpDelta, band);
+  const actualPick = player.draft?.pick || null;
+  const actualPickLabel = actualPick ? `#${actualPick} (${player.draft?.roundPick || window.formatRoundPick(actualPick - 1, teamCount)})` : "—";
+  const adpLabel = `#${Math.round(player.adp)} (${window.formatAdpPick(player.adp, teamCount)})`;
   return (
     <div style={{
       position: "absolute", bottom: "calc(100% + 6px)", left: 0, zIndex: 8,
       padding: "9px 11px", borderRadius: 8,
       background: "rgba(5,8,7,0.97)", border: "1px solid var(--green-600)",
       backdropFilter: "blur(6px)",
-      width: 220, maxWidth: 220,
+      width: 260, maxWidth: 260,
       boxShadow: "0 12px 28px rgba(0,0,0,0.4)",
       pointerEvents: "none",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "start" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ color: "var(--mint-soft)", fontSize: 12, fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{player.name}</div>
-          <div className="mono" style={{ marginTop: 2, color: window.positionColor(player.pos), fontSize: 9 }}>{player.pos} · ADP {window.formatAdpPick(player.adp)}</div>
+          <div className="mono" style={{ marginTop: 2, color: window.positionColor(player.pos), fontSize: 9 }}>{player.pos} · ADP {window.formatAdpPick(player.adp, teamCount)}</div>
         </div>
         <span className="num" style={{ color: draftGrade.color, fontSize: 18, lineHeight: 1 }}>{draftGrade.letter}</span>
       </div>
       <div className="mono" style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr auto", gap: "3px 10px", fontSize: 10 }}>
         <span style={{ color: "var(--slate)" }}>Band</span><span style={{ color: window.valueToneForChip(band) }}>{band}</span>
-        <span style={{ color: "var(--slate)" }}>Value</span><span style={{ color: "var(--mint-soft)" }}>{value}</span>
-        <span style={{ color: "var(--slate)" }}>ADP Δ</span><span style={{ color: adpDelta >= 0 ? "var(--mint)" : "var(--gold)" }}>{adpDelta >= 0 ? "+" : ""}{adpDelta}</span>
-        <span style={{ color: "var(--slate)" }}>C/F Model</span><span style={{ color: "var(--mint-soft)" }}>{model}</span>
+        <span style={{ color: "var(--slate)" }}>Pick</span><span style={{ color: "var(--mint-soft)" }}>{actualPickLabel}</span>
+        <span style={{ color: "var(--slate)" }}>ADP</span><span style={{ color: "var(--mint-soft)" }}>{adpLabel}</span>
+        <span style={{ color: "var(--slate)" }}>Draft Stock</span><span style={{ color: "var(--mint-soft)" }}>{stock}</span>
+        <span style={{ color: "var(--slate)" }}>Pick Price</span><span style={{ color: adpDelta >= 0 ? "var(--mint)" : "var(--gold)" }}>{pickPrice}</span>
+        <span style={{ color: "var(--slate)" }}>EOS Role</span><span style={{ color: "var(--mint-soft)" }}>{role}</span>
         <span style={{ color: "var(--slate)" }}>SOS</span><span style={{ color: "var(--mint-soft)" }}>{sos}/32</span>
       </div>
       <div style={{ marginTop: 8, paddingTop: 7, borderTop: "1px solid rgba(149,249,174,0.16)", color: "var(--slate)", fontSize: 9, lineHeight: 1.4 }}>
-        {deltaLabel} · SOS 1–32 (32 = easiest)
+        {deltaLabel} · {sosNote} · SOS 1–32 (1 = hardest)
       </div>
     </div>
   );
+}
+
+function formatPickPrice(adpDelta, band = "Expected") {
+  if (adpDelta > 0) return `${band} +${adpDelta}`;
+  if (adpDelta < 0) return `${band} ${adpDelta}`;
+  return `${band} 0`;
 }
 
 function PicksRoundBoard({ pickLog, draftOrder, teams, teamCount, rounds }) {
@@ -965,7 +1036,8 @@ function PicksRoundBoard({ pickLog, draftOrder, teams, teamCount, rounds }) {
           <div key={r} style={{ display: "grid", gridTemplateColumns: `48px repeat(${teamCount}, minmax(74px, 1fr))`, gap: 5, alignItems: "stretch" }}>
             <div className="mono" style={{ color: "var(--mint)", fontSize: 11, display: "flex", alignItems: "center" }}>R{r + 1}</div>
             {Array.from({ length: teamCount }, (_, p) => {
-              const pick = r * teamCount + p + 1;
+              const roundPickIndex = r % 2 === 1 ? teamCount - 1 - p : p;
+              const pick = r * teamCount + roundPickIndex + 1;
               const item = byPick[pick];
               const teamNumber = draftOrder[pick - 1];
               const team = teams[teamNumber - 1];

@@ -70,7 +70,7 @@ const DR_COL_HELP = {
   Player:      "Player name, position, team, and weekly matchup.",
   "Proj (Total)": "Projected fantasy points for the full season.",
   Bye:         "The player's NFL bye week.",
-  SOS:         "Strength of schedule score. Higher means easier projected matchups.",
+  SOS:         "Strength of schedule rank based on opponents' combined record. 1 is hardest, 32 is easiest, and each NFL team occupies one rank.",
   Risk:        "How much uncertainty is built into the player's outlook.",
   "Boom / Bust": "Upside vs. downside range based on projected weekly outcomes. The remaining percentage is the neutral or expected outcome range.",
   "YOY Trend": "Compares the player's recent seasons against this year's projection. Mint = trending up, gold = inconsistent, red = trending down. Rookies have no trend.",

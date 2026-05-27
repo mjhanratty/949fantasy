@@ -1,5 +1,6 @@
 # Cursor Prompt: Add Draft Simulator Tab
 
+
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-draft-simulator-cursor-prompt.md`
 
 

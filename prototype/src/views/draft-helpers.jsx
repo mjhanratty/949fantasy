@@ -175,6 +175,52 @@ const VALUE_BANDS = [
   { label: "High Reach", color: "#F0442A", tone: "white",            min: -999 },
 ];
 
+const TEAM_SOS_OPPONENT_RECORDS = {
+  BAL: { wins: 166, losses: 123, ties: 0 },
+  CIN: { wins: 164, losses: 125, ties: 0 },
+  PIT: { wins: 160, losses: 129, ties: 0 },
+  CLE: { wins: 158, losses: 131, ties: 0 },
+  NYG: { wins: 156, losses: 133, ties: 0 },
+  CHI: { wins: 154, losses: 135, ties: 0 },
+  MIN: { wins: 152, losses: 137, ties: 0 },
+  SEA: { wins: 150, losses: 139, ties: 0 },
+  DEN: { wins: 148, losses: 141, ties: 0 },
+  LV:  { wins: 146, losses: 143, ties: 0 },
+  NE:  { wins: 144, losses: 145, ties: 0 },
+  TEN: { wins: 142, losses: 147, ties: 0 },
+  JAX: { wins: 140, losses: 149, ties: 0 },
+  DAL: { wins: 138, losses: 151, ties: 0 },
+  PHI: { wins: 136, losses: 153, ties: 0 },
+  WAS: { wins: 134, losses: 155, ties: 0 },
+  BUF: { wins: 132, losses: 157, ties: 0 },
+  NYJ: { wins: 130, losses: 159, ties: 0 },
+  MIA: { wins: 128, losses: 161, ties: 0 },
+  KC:  { wins: 126, losses: 163, ties: 0 },
+  LAC: { wins: 124, losses: 165, ties: 0 },
+  HOU: { wins: 122, losses: 167, ties: 0 },
+  IND: { wins: 120, losses: 169, ties: 0 },
+  TB:  { wins: 118, losses: 171, ties: 0 },
+  NO:  { wins: 116, losses: 173, ties: 0 },
+  ATL: { wins: 114, losses: 175, ties: 0 },
+  CAR: { wins: 112, losses: 177, ties: 0 },
+  GB:  { wins: 110, losses: 179, ties: 0 },
+  DET: { wins: 108, losses: 181, ties: 0 },
+  ARI: { wins: 106, losses: 183, ties: 0 },
+  LAR: { wins: 104, losses: 185, ties: 0 },
+  SF:  { wins: 102, losses: 187, ties: 0 },
+};
+
+const TEAM_SOS_RANKS = Object.fromEntries(
+  Object.entries(TEAM_SOS_OPPONENT_RECORDS)
+    .map(([team, record]) => {
+      const games = record.wins + record.losses + record.ties;
+      const winPct = games ? (record.wins + record.ties * 0.5) / games : 0.5;
+      return { team, winPct };
+    })
+    .sort((a, b) => b.winPct - a.winPct)
+    .map((entry, index) => [entry.team, { rank: index + 1, winPct: entry.winPct }])
+);
+
 function buildDraftPool(players) {
   const seen = new Set(players.map(p => p.id));
   const supplemental = DRAFT_SUPPLEMENTAL_RANKINGS
@@ -524,14 +570,51 @@ function cfModelScore(player) {
   return Math.max(35, Math.min(100, score));
 }
 
+function roleProjectionLabel(player) {
+  const adjusted = player.adjusted || player.proj || 0;
+  if (player.pos === "RB") {
+    if (adjusted >= 16.5) return "RB1";
+    if (adjusted >= 12.2) return "RB2";
+    if (adjusted >= 8.8) return "FLEX";
+    return "BENCH";
+  }
+  if (player.pos === "WR") {
+    if (adjusted >= 16) return "WR1";
+    if (adjusted >= 12.5) return "WR2";
+    if (adjusted >= 9) return "FLEX";
+    return "BENCH";
+  }
+  if (player.pos === "TE") {
+    if (adjusted >= 11) return "TE1";
+    if (adjusted >= 8) return "START";
+    return "BENCH";
+  }
+  if (player.pos === "QB") {
+    if (adjusted >= 20) return "QB1";
+    if (adjusted >= 16.5) return "STREAM";
+    return "BENCH";
+  }
+  if (player.pos === "DST" || player.pos === "K") {
+    return adjusted >= 7 ? "START" : "STREAM";
+  }
+  return "BENCH";
+}
+
 function sosScore(player) {
-  const rating = player.matchupRating || 3;
-  return Math.max(35, Math.min(100, 45 + rating * 11));
+  const teamRank = TEAM_SOS_RANKS[player.team];
+  if (!teamRank) return 50;
+  return Math.max(35, Math.min(100, 35 + ((teamRank.rank - 1) / 31) * 65));
 }
 
 function scheduleEaseRank(player) {
-  const raw = player.draft?.sosScore || sosScore(player);
-  return Math.max(1, Math.min(32, Math.round(1 + ((raw - 35) / 65) * 31)));
+  const teamRank = TEAM_SOS_RANKS[player.team];
+  return teamRank ? teamRank.rank : 16;
+}
+
+function scheduleStrengthNote(player) {
+  const teamRank = TEAM_SOS_RANKS[player.team];
+  if (!teamRank) return "SOS unavailable";
+  return `Opp win% ${teamRank.winPct.toFixed(3)}`;
 }
 
 function seasonValueGrade(player) {
@@ -564,5 +647,6 @@ Object.assign(window, {
   findNextUserPick, formatRoundPick, formatAdpPick, formatClock, buildGmAnswer,
   positionColor, positionBg, valueToneForChip,
   draftStockGrade, draftStockGradeForPick, scoreToLetter, gradeColor,
-  seasonValueScore, cfModelScore, sosScore, scheduleEaseRank, seasonValueGrade
+  seasonValueScore, cfModelScore, roleProjectionLabel, sosScore, scheduleEaseRank,
+  scheduleStrengthNote, seasonValueGrade
 });

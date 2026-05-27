@@ -1,5 +1,6 @@
 # 949Fantasy Evaluator Layering Spec
 
+
 > **Canonical source:** `/Users/matthewhanratty/Documents/New project/949fantasy-evaluator-layering-spec.md`
 
 
