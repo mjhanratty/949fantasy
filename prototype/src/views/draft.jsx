@@ -58,7 +58,7 @@ function DraftView({ onSelectPlayer }) {
   const userRoster = rosters[`t${userSlot}`] || [];
   const pickLog = React.useMemo(() => window.buildPickLog(board, teams, draftedByPlayerId), [board, teams, draftedByPlayerId]);
   const gm = React.useMemo(() => window.buildGmReadout(availablePlayers, userRoster, pickNumber), [availablePlayers, userRoster, pickNumber]);
-  const grade = React.useMemo(() => window.gradeUserDraft(userRoster), [userRoster]);
+  const grade = React.useMemo(() => window.gradeUserDraft(userRoster, rosterSlots), [userRoster, rosterSlots]);
   const gmBands = React.useMemo(() => window.buildBandGroups(availablePlayers, pickNumber), [availablePlayers, pickNumber]);
 
   React.useEffect(() => {
@@ -140,14 +140,15 @@ function DraftView({ onSelectPlayer }) {
     const selected = ranked.find(p => p.id === player.id) || enriched;
     const bestAvailable = ranked[0];
     const stealAvailable = ranked.find(p => p.valueLabel && p.valueLabel.includes("Steal"));
-    const grade = window.draftStockGradeForPick(enriched, pick);
+    const selectedBand = selected.valueLabel || window.gmBandForPlayer(enriched, pick).label;
+    const grade = window.draftStockGradeForPick({ ...enriched, valueLabel: selectedBand }, pick);
 
     return {
       teamId: `t${teamNumber}`,
       pick,
       roundPick: window.formatRoundPick(draftPickIndex, teamCount),
       adpDelta: pick - enriched.adp,
-      selectedBand: selected.valueLabel || window.gmBandForPlayer(enriched, pick).label,
+      selectedBand,
       draftScore: grade.score,
       draftGrade: grade.letter,
       draftGradeColor: grade.color,
@@ -985,6 +986,8 @@ function ScorePlayerTooltip({ player, teamCount = player.draft?.teamCount || 12 
   const sosNote = window.scheduleStrengthNote(player);
   const band = player.draft?.selectedBand || player.valueLabel || "Expected";
   const pickPrice = formatPickPrice(adpDelta, band);
+  const valueGrade = window.seasonValueGrade(player);
+  const valueIndex = player.valueIndex ? player.valueIndex.toFixed(2) : null;
   const actualPick = player.draft?.pick || null;
   const actualPickLabel = actualPick ? `#${actualPick} (${player.draft?.roundPick || window.formatRoundPick(actualPick - 1, teamCount)})` : "—";
   const adpLabel = `#${Math.round(player.adp)} (${window.formatAdpPick(player.adp, teamCount)})`;
@@ -1009,6 +1012,7 @@ function ScorePlayerTooltip({ player, teamCount = player.draft?.teamCount || 12 
         <span style={{ color: "var(--slate)" }}>Band</span><span style={{ color: window.valueToneForChip(band) }}>{band}</span>
         <span style={{ color: "var(--slate)" }}>Pick</span><span style={{ color: "var(--mint-soft)" }}>{actualPickLabel}</span>
         <span style={{ color: "var(--slate)" }}>ADP</span><span style={{ color: "var(--mint-soft)" }}>{adpLabel}</span>
+        <span style={{ color: "var(--slate)" }}>949 Value</span><span style={{ color: valueGrade.color }}>{valueGrade.letter}{valueIndex ? ` · ${valueIndex}` : ""}</span>
         <span style={{ color: "var(--slate)" }}>Draft Stock</span><span style={{ color: "var(--mint-soft)" }}>{stock}</span>
         <span style={{ color: "var(--slate)" }}>Pick Price</span><span style={{ color: adpDelta >= 0 ? "var(--mint)" : "var(--gold)" }}>{pickPrice}</span>
         <span style={{ color: "var(--slate)" }}>EOS Role</span><span style={{ color: "var(--mint-soft)" }}>{role}</span>
@@ -1022,9 +1026,11 @@ function ScorePlayerTooltip({ player, teamCount = player.draft?.teamCount || 12 
 }
 
 function formatPickPrice(adpDelta, band = "Expected") {
+  if (band === "Expected") return "Expected";
+  if (Math.abs(adpDelta) > 12) return band;
   if (adpDelta > 0) return `${band} +${adpDelta}`;
   if (adpDelta < 0) return `${band} ${adpDelta}`;
-  return `${band} 0`;
+  return band;
 }
 
 function PicksRoundBoard({ pickLog, draftOrder, teams, teamCount, rounds }) {

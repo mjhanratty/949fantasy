@@ -506,6 +506,7 @@ Needs:
 - Draft Stock: numeric pick score for the draft spend chart and pick-level evaluation. Higher means the model liked the selected player at that specific draft cost.
 - Pick Price: user-facing ADP delta phrase, such as `Low Steal +2`, `Expected 0`, or `Low Reach -3`.
 - EOS Role: end-of-season roster role projection, such as `RB1`, `RB2`, `FLEX`, or `BENCH`.
+- Workbook Value Index: when available, 949 Value grade should be driven by the workbook's baseline-relative player value, not by ADP alone.
 - Scoring type.
 - Platform filter.
 

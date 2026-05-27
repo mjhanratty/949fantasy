@@ -221,6 +221,68 @@ const TEAM_SOS_RANKS = Object.fromEntries(
     .map((entry, index) => [entry.team, { rank: index + 1, winPct: entry.winPct }])
 );
 
+const WORKBOOK_VALUE_INDEX = {
+  "A.J. Brown": 1.51325417,
+  "Alvin Kamara": 1.506631849,
+  "Amon-Ra St. Brown": 1.672508716,
+  "Anthony Richardson": 0.5927361788,
+  "Baker Mayfield": 1.410202819,
+  "Bijan Robinson": 1.958003932,
+  "Breece Hall": 1.409071262,
+  "Brock Purdy": 1.222288269,
+  "Bucky Irving": 1.636794961,
+  "C.J. Stroud": 1.33894869,
+  "Caleb Williams": 1.35528575,
+  "CeeDee Lamb": 1.784502068,
+  "Christian McCaffrey": 1.76350023,
+  "D'Andre Swift": 1.334727625,
+  "DJ Moore": 1.33316886,
+  "DK Metcalf": 1.19250521,
+  "Dak Prescott": 1.223975665,
+  "David Montgomery": 1.39696881,
+  "De'Von Achane": 1.623087081,
+  "DeVonta Smith": 1.253429594,
+  "Derrick Henry": 2.104097824,
+  "Drake London": 1.14972375,
+  "Garrett Wilson": 1.212440027,
+  "George Pickens": 1.013987807,
+  "Ja'Marr Chase": 1.682364131,
+  "Jahmyr Gibbs": 2.048772326,
+  "Jalen Hurts": 1.803826275,
+  "James Conner": 1.470818469,
+  "James Cook": 1.374739815,
+  "Jared Goff": 1.670368595,
+  "Jaxon Smith-Njigba": 1.079503918,
+  "Jayden Daniels": 1.867487122,
+  "Jayden Reed": 1.191721257,
+  "Jaylen Waddle": 1.130908867,
+  "Joe Burrow": 1.620973913,
+  "Jonathan Taylor": 1.271992463,
+  "Jordan Addison": 1.234054744,
+  "Jordan Love": 1.044191296,
+  "Josh Allen": 2.072582431,
+  "Josh Jacobs": 1.826482381,
+  "Justin Herbert": 1.43490016,
+  "Justin Jefferson": 1.655037753,
+  "Kyren Williams": 1.284588893,
+  "Ladd McConkey": 1.343248262,
+  "Lamar Jackson": 1.782043527,
+  "Malik Nabers": 1.472264603,
+  "Mike Evans": 1.418507794,
+  "Najee Harris": 1.409318251,
+  "Patrick Mahomes": 1.791094105,
+  "Puka Nacua": 1.387933609,
+  "Rachaad White": 1.294468446,
+  "Rhamondre Stevenson": 1.23667306,
+  "Saquon Barkley": 1.968500957,
+  "Terry McLaurin": 1.301362748,
+  "Tony Pollard": 1.493294453,
+  "Trevor Lawrence": 1.253735194,
+  "Tua Tagovailoa": 1.271529551,
+  "Tyreek Hill": 1.604416758,
+  "Zay Flowers": 1.143676109
+};
+
 function buildDraftPool(players) {
   const seen = new Set(players.map(p => p.id));
   const supplemental = DRAFT_SUPPLEMENTAL_RANKINGS
@@ -235,6 +297,7 @@ function buildDraftPool(players) {
     }));
   return [...players, ...supplemental].map((p, i) => ({
     ...p,
+    valueIndex: WORKBOOK_VALUE_INDEX[p.name] || p.valueIndex || null,
     adp: p.adp || i + 1,
     rank: p.rank || i + 1,
     boardRank: Math.min(p.adp || i + 1, p.rank || i + 1),
@@ -315,7 +378,17 @@ function gmBandForPlayer(player, pickNumber, availableRank = null) {
   const nearPickWindow = player.adp <= pickNumber + futureWindow;
   const boardOpportunity = nearPickWindow && !["K", "DST"].includes(player.pos) && !["D", "F"].includes(value.letter)
     ? Math.min(12, Math.max(0, boardDelta * 0.16)) : 0;
-  let score = pickWindowDelta + boardOpportunity + valueBoost - riskPenalty - lifecyclePenalty;
+  const marketPressure = availableRank == null
+    ? Math.max(-18, Math.min(24, pickWindowDelta))
+    : Math.max(-8, Math.min(10, pickWindowDelta * 0.2));
+  const availabilityScore = availableRank == null ? 0 : Math.max(-10, Math.min(16, (6 - availableRank) * 3));
+  let score = marketPressure + availabilityScore + boardOpportunity + valueBoost - riskPenalty - lifecyclePenalty;
+  if (player.valueIndex >= 1.35 && pickNumber >= 50 && !["K", "DST"].includes(player.pos)) {
+    score = Math.max(score, 10);
+  }
+  if (player.valueIndex >= 1.8 && pickNumber >= 35 && !["K", "DST"].includes(player.pos)) {
+    score = Math.max(score, 16);
+  }
   if (pickNumber >= 60 && availableRank != null && !["K", "DST"].includes(player.pos) && !["F"].includes(value.letter)) {
     score = Math.max(score, 8 - availableRank * 2.8);
   } else if (pickNumber >= 40 && availableRank != null && !["K", "DST"].includes(player.pos) && !["F"].includes(value.letter)) {
@@ -394,8 +467,15 @@ function rosterNeedScore(pos, counts) {
   return (targets[pos] || 1) - (counts[pos] || 0);
 }
 
-function gradeUserDraft(roster) {
+function gradeUserDraft(roster, rosterSlots = buildRosterSlots(DEFAULT_ROSTER_CONFIG)) {
   if (!roster.length) return { letter: "—", color: "var(--slate)", note: "No picks yet", core: 0 };
+  const lineup = buildScoredLineup(roster, rosterSlots);
+  const starters = lineup.filter(item => item.slot !== "BENCH").map(item => item.player);
+  const bench = lineup.filter(item => item.slot === "BENCH").map(item => item.player);
+  if (!bench.length && starters.length === roster.length) {
+    const starterGrade = gradeLineupDraft(starters);
+    return { ...starterGrade, core: roster.reduce((s, p) => s + p.adjusted, 0), buckets: countDraftBuckets(roster) };
+  }
   const avgDraftScore = roster.reduce((s, p) => s + (p.draft?.draftScore || draftStockGrade(p).score || 60), 0) / roster.length;
   const counts = countPositions(roster);
   const balance = Math.min(counts.RB || 0, 2) + Math.min(counts.WR || 0, 2) + Math.min(counts.QB || 0, 1) + Math.min(counts.TE || 0, 1);
@@ -525,11 +605,24 @@ function draftStockGrade(player) {
 function draftStockGradeForPick(player, pickNumber) {
   const adpDelta = pickNumber - player.adp;
   const value = seasonValueScore(player);
-  const adpScore = Math.max(28, Math.min(100, 72 + adpDelta * 1.55));
+  const marketPressure = Math.max(-8, Math.min(12, adpDelta));
+  const adpScore = Math.max(48, Math.min(88, 72 + marketPressure * 1.1));
   const model = cfModelScore(player);
   const schedule = sosScore(player);
+  const band = player.draft?.selectedBand || player.valueLabel || "Expected";
+  const bandAdjust = band.includes("High Steal") ? 10
+    : band.includes("Mid Steal") ? 7
+    : band.includes("Low Steal") ? 4
+    : band === "Expected" ? 0
+    : band.includes("Low Reach") ? -4
+    : band.includes("Mid Reach") ? -8
+    : band.includes("High Reach") ? -14
+    : 0;
+  const workbookLateValueBonus = player.valueIndex >= 1.8 && pickNumber >= 35 ? 10
+    : player.valueIndex >= 1.35 && pickNumber >= 50 ? 7
+    : 0;
   const riskPenalty = player.risk === "high" ? 3.5 : player.risk === "med" ? 1.5 : 0;
-  let score = Math.max(30, Math.min(100, value * 0.42 + adpScore * 0.30 + model * 0.18 + schedule * 0.10 - riskPenalty));
+  let score = Math.max(30, Math.min(100, value * 0.50 + model * 0.23 + schedule * 0.09 + adpScore * 0.08 + bandAdjust + workbookLateValueBonus - riskPenalty));
   if (pickNumber <= 12 && player.adp <= 6) score = Math.max(score, 88);
   if (pickNumber <= player.adp + 1 && player.adp <= 6) score = Math.max(score, 88);
   const letter = scoreToLetter(score, value, adpDelta);
@@ -542,8 +635,7 @@ function scoreToLetter(score, valueScore, adpDelta) {
   if (score >= 76) return "B";
   if (score >= 64) return "C";
   if (score >= 52) return "D";
-  if (valueScore < 55 && adpDelta < -25) return "F";
-  if (adpDelta < -75) return "F";
+  if (valueScore < 55 && adpDelta < -75) return "F";
   return "D";
 }
 
@@ -555,6 +647,9 @@ function gradeColor(letter) {
 }
 
 function seasonValueScore(player) {
+  if (player.valueIndex && player.valueIndex > 0) {
+    return Math.max(35, Math.min(100, 62 + (player.valueIndex - 0.9) * 55));
+  }
   const grade = seasonValueGrade(player).letter;
   const gradeBase = ({ "A+": 96, "A": 88, "B": 78, "C": 67, "D": 56, "F": 42 })[grade] || 60;
   const projectionBonus = Math.max(-5, Math.min(8, ((player.adjusted || player.proj || 0) - 10) * 0.6));
@@ -590,8 +685,8 @@ function roleProjectionLabel(player) {
     return "BENCH";
   }
   if (player.pos === "QB") {
-    if (adjusted >= 20) return "QB1";
-    if (adjusted >= 16.5) return "STREAM";
+    if (adjusted >= 18) return "QB1";
+    if (adjusted >= 15.5) return "STREAM";
     return "BENCH";
   }
   if (player.pos === "DST" || player.pos === "K") {
@@ -618,6 +713,14 @@ function scheduleStrengthNote(player) {
 }
 
 function seasonValueGrade(player) {
+  if (player.valueIndex && player.valueIndex > 0) {
+    if (player.valueIndex >= 1.8) return { letter: "A+", color: "var(--mint)" };
+    if (player.valueIndex >= 1.35) return { letter: "A", color: "var(--mint)" };
+    if (player.valueIndex >= 1.1) return { letter: "B", color: "var(--mint-soft)" };
+    if (player.valueIndex >= 0.9) return { letter: "C", color: "var(--gold)" };
+    if (player.valueIndex >= 0.7) return { letter: "D", color: "var(--gold)" };
+    return { letter: "F", color: "var(--red)" };
+  }
   if (player.pos === "DST" || player.pos === "K") {
     if (player.adp <= 220) return { letter: "B", color: "var(--mint-soft)" };
     if (player.adp <= 245) return { letter: "C", color: "var(--gold)" };
