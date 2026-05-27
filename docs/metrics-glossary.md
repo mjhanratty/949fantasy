@@ -362,6 +362,19 @@ If QBs average `315` points and a QB scores `385`:
 385 / 315 = 1.22
 ```
 
+Player value grades should use position-specific thresholds rather than one global cutoff. The same raw value ratio can mean different things at QB, RB, WR, and TE because each position has a different starter count, replacement pool, and scoring spread.
+
+Prototype threshold map:
+
+```txt
+QB: A+ 1.80+, A 1.40+, B 1.15+, C 0.95+, D 0.75+
+RB: A+ 1.80+, A 1.35+, B 1.10+, C 0.90+, D 0.70+
+WR: A+ 1.65+, A 1.35+, B 1.10+, C 0.90+, D 0.70+
+TE: A+ 1.55+, A 1.25+, B 1.05+, C 0.85+, D 0.65+
+```
+
+Position-filtered rankings sort by this position value from top to bottom. Overall rankings should sort by replacement-adjusted impact, combining projected points above a position baseline, scoring format, lineup demand, and scarcity.
+
 Interpretation:
 
 - `1.00` = position baseline.

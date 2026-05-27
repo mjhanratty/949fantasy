@@ -55,14 +55,16 @@ function yoyTrendColor(data) {
 }
 
 const VALUE_TIER_META = {
-  "A+": { color: "var(--mint)",      label: "Tier 1", multiplier: "1.25\u00d7+",   note: "Elite value · 1.25\u00d7+ projected return vs draft cost. Anchor every build around these." },
-  "A":  { color: "var(--mint)",      label: "Tier 2", multiplier: "1.10\u20131.25\u00d7", note: "Strong value · 1.10\u20131.25\u00d7 projected return. Early-round cornerstones with clean profiles." },
-  "B":  { color: "var(--mint-soft)", label: "Tier 3", multiplier: "0.95\u20131.10\u00d7", note: "Fair value · 0.95\u20131.10\u00d7 projected return. Reliable starters at expected cost." },
-  "C":  { color: "var(--gold)",      label: "Tier 4", multiplier: "0.80\u20130.95\u00d7", note: "Slight reach · 0.80\u20130.95\u00d7 return. Volatile flex starters and high-upside swings." },
-  "D":  { color: "var(--gold)",      label: "Tier 5", multiplier: "0.60\u20130.80\u00d7", note: "Reach · 0.60\u20130.80\u00d7 return. Bench depth and late-round darts." },
-  "F":  { color: "var(--red)",       label: "Tier 6", multiplier: "<0.60\u00d7",        note: "Avoid · below 0.60\u00d7 return. Profile or risk doesn't justify the cost." },
+  "A+": { color: "var(--mint)",      label: "Tier 1", note: "Elite positional value. Anchor every build around these when draft cost is reasonable." },
+  "A":  { color: "var(--mint)",      label: "Tier 2", note: "Strong positional value. Early-round cornerstones or discounted starters with clean profiles." },
+  "B":  { color: "var(--mint-soft)", label: "Tier 3", note: "Useful positional value. Reliable starters at expected cost." },
+  "C":  { color: "var(--gold)",      label: "Tier 4", note: "Replacement-adjacent value. Volatile flex starters and high-upside swings." },
+  "D":  { color: "var(--gold)",      label: "Tier 5", note: "Thin value. Bench depth and late-round darts." },
+  "F":  { color: "var(--red)",       label: "Tier 6", note: "Avoid unless the role or draft cost changes." },
 };
 const TIER_ORDER = ["A+", "A", "B", "C", "D", "F"];
+const OVERALL_BASELINE_RANK = { QB: 12, RB: 30, WR: 36, TE: 12, DST: 4, K: 4 };
+const OVERALL_SCARCITY_WEIGHT = { QB: 0.62, RB: 1.12, WR: 1.0, TE: 0.76, DST: 0.18, K: 0.12 };
 
 // Column-header definitions surfaced via the HelpTip hover.
 const DR_COL_HELP = {
@@ -74,8 +76,39 @@ const DR_COL_HELP = {
   Risk:        "How much uncertainty is built into the player's outlook.",
   "Boom / Bust": "Upside vs. downside range based on projected weekly outcomes. The remaining percentage is the neutral or expected outcome range.",
   "YOY Trend": "Compares the player's recent seasons against this year's projection. Mint = trending up, gold = inconsistent, red = trending down. Rookies have no trend.",
-  Value:       "949 value grade based on projected return versus expected draft cost.",
+  Value:       "949 value grade. Position tabs use position-specific value tiers. Overall weighs projected edge, replacement depth, lineup demand, and scoring format.",
 };
+
+function tierRangeLabel(pos, tier) {
+  const thresholds = window.POSITION_VALUE_THRESHOLDS?.[pos] || window.POSITION_VALUE_THRESHOLDS?.RB;
+  if (!thresholds) return "position-adjusted";
+  if (tier === "A+") return `${thresholds["A+"].toFixed(2)}x+`;
+  if (tier === "A") return `${thresholds.A.toFixed(2)}-${thresholds["A+"].toFixed(2)}x`;
+  if (tier === "B") return `${thresholds.B.toFixed(2)}-${thresholds.A.toFixed(2)}x`;
+  if (tier === "C") return `${thresholds.C.toFixed(2)}-${thresholds.B.toFixed(2)}x`;
+  if (tier === "D") return `${thresholds.D.toFixed(2)}-${thresholds.C.toFixed(2)}x`;
+  return `<${thresholds.D.toFixed(2)}x`;
+}
+
+function overallImpactScore(player, baselines) {
+  const projected = (player.adjusted || player.proj || 0) * 17;
+  const baseline = baselines[player.pos] || 0;
+  const replacementEdge = Math.max(0, projected - baseline);
+  const scarcity = OVERALL_SCARCITY_WEIGHT[player.pos] || 0.5;
+  const valueLift = player.valueIndex ? Math.max(-10, Math.min(22, (player.valueIndex - 1) * 24)) : 0;
+  const riskPenalty = player.risk === "high" ? 12 : player.risk === "med" ? 5 : 0;
+  return replacementEdge * scarcity + valueLift - riskPenalty;
+}
+
+function buildOverallBaselines(players) {
+  return Object.fromEntries(Object.entries(OVERALL_BASELINE_RANK).map(([position, rank]) => {
+    const sorted = players
+      .filter(p => p.pos === position)
+      .sort((a, b) => ((b.adjusted || b.proj || 0) - (a.adjusted || a.proj || 0)));
+    const baselinePlayer = sorted[Math.min(rank - 1, sorted.length - 1)];
+    return [position, baselinePlayer ? (baselinePlayer.adjusted || baselinePlayer.proj || 0) * 17 : 0];
+  }));
+}
 
 // Inline hover-tooltip used on column headers and the tier badge.
 // Uses CSS :hover (not React state) so the popup stays visible while the
@@ -113,16 +146,24 @@ function DraftRankingsView({ onSelectPlayer }) {
   const [search, setSearch] = React.useState("");
 
   const enriched = React.useMemo(() => {
-    return basePlayers.map(p => {
+    const scored = basePlayers.map(p => {
       const adjusted = window.scoringProjection(p, scoring);
       return { ...p, adjusted, tier: window.seasonValueGrade({ ...p, adjusted }).letter };
     });
+    const baselines = buildOverallBaselines(scored);
+    return scored.map(p => ({ ...p, overallImpact: overallImpactScore(p, baselines) }));
   }, [basePlayers, scoring]);
 
-  const filtered = enriched
-    .filter(p => pos === "ALL" || p.pos === pos || (pos === "FLEX" && ["RB", "WR", "TE"].includes(p.pos)))
-    .filter(p => !search || `${p.name} ${p.team} ${p.pos}`.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => a.adp - b.adp);
+  const filtered = React.useMemo(() => {
+    const positionFiltered = enriched
+      .filter(p => pos === "ALL" || p.pos === pos || (pos === "FLEX" && ["RB", "WR", "TE"].includes(p.pos)))
+      .filter(p => !search || `${p.name} ${p.team} ${p.pos}`.toLowerCase().includes(search.toLowerCase()));
+    const sorted = positionFiltered.sort((a, b) => {
+      if (pos === "ALL") return b.overallImpact - a.overallImpact || (b.valueIndex || 0) - (a.valueIndex || 0) || a.adp - b.adp;
+      return (b.valueIndex || 0) - (a.valueIndex || 0) || ((b.adjusted || b.proj || 0) - (a.adjusted || a.proj || 0)) || a.adp - b.adp;
+    });
+    return sorted.map((p, index) => ({ ...p, displayRank: index + 1 }));
+  }, [enriched, pos, search]);
 
   const byTier = Object.fromEntries(TIER_ORDER.map(t => [t, []]));
   filtered.forEach(p => { if (byTier[p.tier]) byTier[p.tier].push(p); });
@@ -137,7 +178,9 @@ function DraftRankingsView({ onSelectPlayer }) {
             Draft · Pre-Season Rankings
           </div>
           <h1 className="display" style={{ margin: 0, fontSize: 32, color: "var(--mint-soft)", lineHeight: 1 }}>Player Breakdown</h1>
-          <p style={{ marginTop: 6, color: "var(--slate)", fontSize: 13 }}>949 Value tiers · {totalCount} players · {scoring.toUpperCase()}</p>
+          <p style={{ marginTop: 6, color: "var(--slate)", fontSize: 13 }}>
+            {pos === "ALL" ? "Replacement-adjusted overall impact" : "Position value tiers"} · {totalCount} players · {scoring.toUpperCase()}
+          </p>
         </div>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -191,6 +234,7 @@ function DraftRankingsView({ onSelectPlayer }) {
           const tierPlayers = byTier[tier];
           if (!tierPlayers || !tierPlayers.length) return null;
           const meta = VALUE_TIER_META[tier];
+          const range = pos === "ALL" || pos === "FLEX" ? "position-specific" : tierRangeLabel(pos, tier);
           return (
             <React.Fragment key={tier}>
               <div style={{
@@ -214,12 +258,12 @@ function DraftRankingsView({ onSelectPlayer }) {
                     }}>{tier}</span>
                   }>
                   <strong style={{ color: meta.color, display: "block", marginBottom: 4 }}>
-                    {meta.label} · Grade {tier} · {meta.multiplier}
+                    {meta.label} · Grade {tier} · {range}
                   </strong>
-                  Players grouped by similar value, projection, and draft profile. {meta.note}
+                  Players grouped by position-adjusted value, projection, and draft profile. {meta.note}
                 </HelpTip>
                 <span className="mono" style={{ fontSize: 10, color: meta.color, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700 }}>
-                  {meta.label} · {meta.multiplier}
+                  {meta.label} · {range}
                 </span>
                 <span style={{ fontSize: 12, color: "var(--slate)" }}>{meta.note}</span>
                 <span style={{ flex: 1, height: 1, background: "linear-gradient(to right, var(--green-600), transparent)" }} />
@@ -242,7 +286,7 @@ function DraftRankingsView({ onSelectPlayer }) {
                     onMouseEnter={e => e.currentTarget.style.background = "rgba(22,56,36,0.55)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <DrCell align="center">
-                      <span className="num" style={{ fontSize: 17, color: "var(--mint-soft)" }}>{p.adp}</span>
+                      <span className="num" style={{ fontSize: 17, color: "var(--mint-soft)" }}>{p.displayRank}</span>
                     </DrCell>
                     <DrCell align="flex-start">
                       <PlayerCell player={p} />

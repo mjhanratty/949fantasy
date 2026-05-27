@@ -221,6 +221,15 @@ const TEAM_SOS_RANKS = Object.fromEntries(
     .map((entry, index) => [entry.team, { rank: index + 1, winPct: entry.winPct }])
 );
 
+const POSITION_VALUE_THRESHOLDS = {
+  QB:  { "A+": 1.80, A: 1.40, B: 1.15, C: 0.95, D: 0.75 },
+  RB:  { "A+": 1.80, A: 1.35, B: 1.10, C: 0.90, D: 0.70 },
+  WR:  { "A+": 1.65, A: 1.35, B: 1.10, C: 0.90, D: 0.70 },
+  TE:  { "A+": 1.55, A: 1.25, B: 1.05, C: 0.85, D: 0.65 },
+  DST: { "A+": 1.25, A: 1.10, B: 0.95, C: 0.80, D: 0.65 },
+  K:   { "A+": 1.25, A: 1.10, B: 0.95, C: 0.80, D: 0.65 },
+};
+
 const WORKBOOK_VALUE_INDEX = {
   "A.J. Brown": 1.51325417,
   "Alvin Kamara": 1.506631849,
@@ -661,7 +670,14 @@ function gradeColor(letter) {
 
 function seasonValueScore(player) {
   if (player.valueIndex && player.valueIndex > 0) {
-    return Math.max(35, Math.min(100, 62 + (player.valueIndex - 0.9) * 55));
+    const thresholds = POSITION_VALUE_THRESHOLDS[player.pos] || POSITION_VALUE_THRESHOLDS.RB;
+    const value = player.valueIndex;
+    if (value >= thresholds["A+"]) return Math.max(94, Math.min(100, 94 + (value - thresholds["A+"]) * 12));
+    if (value >= thresholds.A) return 86 + ((value - thresholds.A) / (thresholds["A+"] - thresholds.A)) * 8;
+    if (value >= thresholds.B) return 76 + ((value - thresholds.B) / (thresholds.A - thresholds.B)) * 10;
+    if (value >= thresholds.C) return 64 + ((value - thresholds.C) / (thresholds.B - thresholds.C)) * 12;
+    if (value >= thresholds.D) return 52 + ((value - thresholds.D) / (thresholds.C - thresholds.D)) * 12;
+    return Math.max(35, 42 + (value / thresholds.D) * 10);
   }
   const grade = seasonValueGrade(player).letter;
   const gradeBase = ({ "A+": 96, "A": 88, "B": 78, "C": 67, "D": 56, "F": 42 })[grade] || 60;
@@ -727,11 +743,12 @@ function scheduleStrengthNote(player) {
 
 function seasonValueGrade(player) {
   if (player.valueIndex && player.valueIndex > 0) {
-    if (player.valueIndex >= 1.8) return { letter: "A+", color: "var(--mint)" };
-    if (player.valueIndex >= 1.35) return { letter: "A", color: "var(--mint)" };
-    if (player.valueIndex >= 1.1) return { letter: "B", color: "var(--mint-soft)" };
-    if (player.valueIndex >= 0.9) return { letter: "C", color: "var(--gold)" };
-    if (player.valueIndex >= 0.7) return { letter: "D", color: "var(--gold)" };
+    const thresholds = POSITION_VALUE_THRESHOLDS[player.pos] || POSITION_VALUE_THRESHOLDS.RB;
+    if (player.valueIndex >= thresholds["A+"]) return { letter: "A+", color: "var(--mint)" };
+    if (player.valueIndex >= thresholds.A) return { letter: "A", color: "var(--mint)" };
+    if (player.valueIndex >= thresholds.B) return { letter: "B", color: "var(--mint-soft)" };
+    if (player.valueIndex >= thresholds.C) return { letter: "C", color: "var(--gold)" };
+    if (player.valueIndex >= thresholds.D) return { letter: "D", color: "var(--gold)" };
     return { letter: "F", color: "var(--red)" };
   }
   if (player.pos === "DST" || player.pos === "K") {
@@ -754,7 +771,7 @@ function seasonValueGrade(player) {
 }
 
 Object.assign(window, {
-  DRAFT_SUPPLEMENTAL_RANKINGS, DEFAULT_ROSTER_CONFIG, DRAFT_TEAM_NAMES, VALUE_BANDS,
+  DRAFT_SUPPLEMENTAL_RANKINGS, DEFAULT_ROSTER_CONFIG, DRAFT_TEAM_NAMES, VALUE_BANDS, POSITION_VALUE_THRESHOLDS,
   buildDraftPool, buildDraftOrder, buildRosterSlots, assignRosterSlots,
   scoringProjection, valueBand, enrichDraftPlayer, applyLiveBoardBands, gmBandForPlayer,
   buildRosters, chooseComputerPick, rosterNeedBonus, countPositions,

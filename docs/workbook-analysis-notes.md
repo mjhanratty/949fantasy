@@ -83,18 +83,24 @@ actual_value = historical_or_actual_average / position_group_average
 projected_value = projected_points / projected_position_average
 ```
 
-For 949Fantasy, value should drive tiers and A+ to F grades.
+For 949Fantasy, value should drive tiers and A+ to F grades, but thresholds must be position-specific. A single 1.25+ cutoff overstates QB value in 1-QB leagues and understates elite WR scarcity because each position has a different scoring spread and replacement curve.
 
-| Value | Grade |
-| --- | --- |
-| 1.25+ | A+ |
-| 1.10 - 1.24 | A |
-| 0.95 - 1.09 | B |
-| 0.80 - 0.94 | C |
-| 0.65 - 0.79 | D |
-| < 0.65 | F |
+Recommended prototype thresholds:
 
-This version intentionally keeps the top tier exclusive. A+ should mean the player is creating a clear positional advantage, not merely sitting above the average player.
+| Position | A+ | A | B | C | D | F |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| QB | 1.80+ | 1.40+ | 1.15+ | 0.95+ | 0.75+ | <0.75 |
+| RB | 1.80+ | 1.35+ | 1.10+ | 0.90+ | 0.70+ | <0.70 |
+| WR | 1.65+ | 1.35+ | 1.10+ | 0.90+ | 0.70+ | <0.70 |
+| TE | 1.55+ | 1.25+ | 1.05+ | 0.85+ | 0.65+ | <0.65 |
+
+This version intentionally keeps A+ exclusive by position. A+ should mean the player is creating a clear positional advantage, not merely sitting above the average player.
+
+Ranking behavior:
+
+- Position filters rank players by positional value from highest to lowest.
+- Overall ranks players by replacement-adjusted impact, not raw projected points or raw value alone.
+- Overall should account for scoring format, lineup demand, replacement depth, and scarcity. A 315-point RB can outrank a 315-point QB because comparable QB production is easier to replace in a 1-QB build.
 
 Needed production fields:
 

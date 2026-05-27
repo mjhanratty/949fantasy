@@ -1101,16 +1101,18 @@ The `Expected` player is the central expected pick for the user's current draft 
 player_value = player_points / position_group_average_points
 ```
 
-Initial grade mapping:
+Grade mapping must be position-specific. Do not use one global `1.25+ = A+` rule because QB, RB, WR, and TE have different replacement curves and scoring spreads.
+
+Prototype grade mapping:
 
 ```txt
-A+: player_value > 1.00
-A:  0.90 <= player_value <= 1.00
-B:  0.80 <= player_value < 0.90
-C:  0.70 <= player_value < 0.80
-D:  0.60 <= player_value < 0.70
-F:  player_value < 0.60, meaning anything below 0.60
+QB: A+ 1.80+, A 1.40+, B 1.15+, C 0.95+, D 0.75+
+RB: A+ 1.80+, A 1.35+, B 1.10+, C 0.90+, D 0.70+
+WR: A+ 1.65+, A 1.35+, B 1.10+, C 0.90+, D 0.70+
+TE: A+ 1.55+, A 1.25+, B 1.05+, C 0.85+, D 0.65+
 ```
+
+Position tabs should rank players by positional value from top to bottom. Overall should rank by replacement-adjusted impact: projected edge over position baseline, scoring format, lineup demand, scarcity, and risk.
 
 Store last-season, projected, and career versions where data exists.
 
