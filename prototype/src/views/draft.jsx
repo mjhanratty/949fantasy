@@ -936,7 +936,7 @@ function ScoreCardBoard({ userRoster, grade, gm, pickLog, rosterSlots, teamCount
           <div className="mono" style={{ color: "var(--slate)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em" }}>Starting Lineup Grade</div>
           <div className="num" style={{ color: starterGrade.color, fontSize: 68, marginTop: 10, lineHeight: 0.9 }}>{starterGrade.letter}</div>
           <div style={{ color: "var(--mint-soft)", fontSize: 15, fontWeight: 800, marginTop: 14 }}>{starterGrade.note}</div>
-          <div className="mono" style={{ color: "var(--slate)", fontSize: 10, marginTop: 6 }}>{starters.length} starters · {(starterGrade.score || 0).toFixed(1)} avg draft score</div>
+          <div className="mono" style={{ color: "var(--slate)", fontSize: 10, marginTop: 6 }}>{starters.length} starters · {(starterGrade.score || 0).toFixed(1)} draft score</div>
         </div>
         <div style={{ padding: 14, borderRadius: 10, background: "var(--green-900)", border: "1px solid var(--green-600)" }}>
           <div className="mono" style={{ color: "var(--mint)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em" }}>Draft Summary</div>

@@ -37,7 +37,7 @@ function PlayerTapeView({ onSelectPlayer }) {
         <div>
           <div className="mono" style={{ fontSize: 11, color: "var(--mint)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: 6 }}>Projections · Player Tape</div>
           <h1 className="display" style={{ margin: 0, fontSize: 36, color: "var(--mint-soft)" }}>The 949 Ticker</h1>
-          <p style={{ marginTop: 6, color: "var(--slate)", fontSize: 13 }}>Treat every player like a stock. Open = projection. Close = points scored. Wick = floor / ceiling.</p>
+          <p style={{ marginTop: 6, color: "var(--slate)", fontSize: 13 }}>Treat every player like a stock. Proj = projection. Final = points scored. Wick = floor / ceiling.</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <TabBar tabs={[
@@ -94,9 +94,9 @@ function PlayerTapeView({ onSelectPlayer }) {
           {/* Candlestick chart */}
           <div className="card" style={{ padding: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
-              <SectionTitle eyebrow="Weekly tape">Open / Close / Floor / Ceiling</SectionTitle>
+              <SectionTitle eyebrow="Weekly tape">Proj / Final / Floor / Ceiling</SectionTitle>
               <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-                <CandleLegend color="var(--mint)" label="Up week (close > open)" filled />
+                <CandleLegend color="var(--mint)" label="Up week (final > proj)" filled />
                 <CandleLegend color="var(--red)" label="Down week" />
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                   <span style={{ width: 12, height: 1, background: "var(--slate)" }} />
@@ -135,7 +135,7 @@ function PlayerTapeView({ onSelectPlayer }) {
           {/* If multiple players picked, show comparison line */}
           {pickIds.length > 1 && (
             <div className="card" style={{ padding: 22 }}>
-              <SectionTitle eyebrow="Comparison overlay">{pickIds.length} players · weekly close (actual / projected)</SectionTitle>
+              <SectionTitle eyebrow="Comparison overlay">{pickIds.length} players · weekly final vs proj</SectionTitle>
               <ComparisonLines pickIds={pickIds} />
             </div>
           )}
@@ -283,8 +283,8 @@ function CandlestickChart({ log, currentWeek, showProj, hoverWk, setHoverWk }) {
             <div className="mono" style={{ fontSize: 10, color: "var(--mint)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Week {g.wk}</div>
             <div style={{ marginTop: 4, fontSize: 13, color: "var(--mint-soft)" }}>{g.home ? "vs" : "@"} {g.opp}</div>
             <div className="mono" style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr auto", gap: "2px 12px", fontSize: 11 }}>
-              <span style={{ color: "var(--slate)" }}>Open (proj)</span> <span style={{ color: "var(--mint-soft)" }}>{g.proj.toFixed(1)}</span>
-              <span style={{ color: "var(--slate)" }}>Close (actual)</span> <span style={{ color: g.actual != null ? (g.actual >= g.proj ? "var(--mint)" : "var(--red)") : "var(--slate-dim)" }}>{g.actual != null ? g.actual.toFixed(1) : "—"}</span>
+              <span style={{ color: "var(--slate)" }}>Proj</span> <span style={{ color: "var(--mint-soft)" }}>{g.proj.toFixed(1)}</span>
+              <span style={{ color: "var(--slate)" }}>Final</span> <span style={{ color: g.actual != null ? (g.actual >= g.proj ? "var(--mint)" : "var(--red)") : "var(--slate-dim)" }}>{g.actual != null ? g.actual.toFixed(1) : "—"}</span>
               <span style={{ color: "var(--slate)" }}>Ceiling</span> <span style={{ color: "var(--slate)" }}>{g.ceiling.toFixed(1)}</span>
               <span style={{ color: "var(--slate)" }}>Floor</span> <span style={{ color: "var(--slate)" }}>{g.floor.toFixed(1)}</span>
             </div>
@@ -517,7 +517,7 @@ function SeasonProjectionPanel({ baselineSeason, baselinePerWk, playedActual, pl
         <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
           <div>
             <span className="num" style={{ fontSize: 22, color: "var(--mint-soft)" }}>{playedActual.toFixed(1)}</span>
-            <span className="mono" style={{ marginLeft: 6, fontSize: 11, color: "var(--slate)" }}>actual</span>
+            <span className="mono" style={{ marginLeft: 6, fontSize: 11, color: "var(--slate)" }}>final</span>
           </div>
           <span className="mono" style={{ fontSize: 14, color: "var(--slate-dim)" }}>vs</span>
           <div>

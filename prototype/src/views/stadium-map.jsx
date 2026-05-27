@@ -2,34 +2,30 @@
 // Hover any city to see game time, opponent, weather, and your players in that game.
 
 function StadiumMap({ onSelectPlayer }) {
-  const { NFL_MAP_MARKERS, WEEK11_GAMES, PLAYERS, ROSTER_IDS, mapSiteForTeam, WEEK11_HOME_AT_SHARED } = window;
+  const { NFL_CITIES, WEEK11_GAMES, PLAYERS, ROSTER_IDS, TEAMS } = window;
   const [hoverCity, setHoverCity] = React.useState(null);
   const [tooltipPos, setTooltipPos] = React.useState({ x: 0, y: 0 });
 
   // Build city game data — opponent, weather, players-of-interest
   // Match cities up with games this week (Week 11)
-  const statusRank = { you: 4, opp: 3, neutral: 2, off: 1 };
   const cityGameData = React.useMemo(() => {
     const map = {};
-    NFL_MAP_MARKERS.forEach((marker) => {
-      const teams = marker.teamsAtSite;
-      let status = "off";
-      teams.forEach((t) => {
-        const s = WEEK11_GAMES[t] || "off";
-        if ((statusRank[s] || 0) > (statusRank[status] || 0)) status = s;
-      });
-      const labelTeam = marker.team;
-      const homePlayers = PLAYERS.filter((p) => teams.includes(p.team) && ROSTER_IDS.includes(p.id));
-      const sameTeamPlayer = PLAYERS.find((p) => p.team === labelTeam);
-      const opponent = sameTeamPlayer ? sameTeamPlayer.matchup.replace("@", "").replace("vs ", "").trim() : null;
-      map[labelTeam] = {
-        ...marker,
-        city: marker.city,
+    NFL_CITIES.forEach(city => {
+      const status = WEEK11_GAMES[city.team] || "off";
+      // Find your roster players on this team
+      const homePlayers = PLAYERS.filter(p => p.team === city.team && ROSTER_IDS.includes(p.id));
+      // Find opponent matchup string from any player whose team is this city
+      const sameTeamPlayer = PLAYERS.find(p => p.team === city.team);
+      let opponent = sameTeamPlayer ? sameTeamPlayer.matchup.replace("@", "").replace("vs ", "").trim() : null;
+      // If team is the away team this week, opponent is the home team where game is played
+      // For mock: we'll just say what we have
+      map[city.team] = {
+        ...city,
         status,
         homePlayers,
         opponent,
         kickoff: "Sun 1:00pm ET",
-        weather: marker.indoor ? "Dome · 72°F" : ["Clear · 38°F · 6mph wind", "Partly cloudy · 52°F", "Rain · 44°F · 12mph wind", "Snow · 28°F · 8mph wind", "Clear · 64°F"][labelTeam.charCodeAt(0) % 5],
+        weather: city.indoor ? "Dome · 72°F" : ["Clear · 38°F · 6mph wind", "Partly cloudy · 52°F", "Rain · 44°F · 12mph wind", "Snow · 28°F · 8mph wind", "Clear · 64°F"][city.team.charCodeAt(0) % 5],
       };
     });
     return map;
@@ -91,28 +87,27 @@ function StadiumMap({ onSelectPlayer }) {
           )}
 
           {/* City dots */}
-          {NFL_MAP_MARKERS.map((marker) => {
-            const cg = cityGameData[marker.team];
-            if (!cg) return null;
+          {NFL_CITIES.map(city => {
+            const cg = cityGameData[city.team];
             const c = statusColor[cg.status];
             const active = cg.status !== "off";
-            const isHover = hoverCity === marker.team;
+            const isHover = hoverCity === city.team;
             const r = active ? (isHover ? 18 : 14) : 8;
             return (
-              <g key={marker.team}
-                 onMouseEnter={() => { setHoverCity(marker.team); setTooltipPos({ x: marker.x, y: marker.y }); }}
+              <g key={city.team}
+                 onMouseEnter={(e) => { setHoverCity(city.team); setTooltipPos({ x: city.x, y: city.y }); }}
                  onMouseLeave={() => setHoverCity(null)}
                  style={{ cursor: active ? "pointer" : "default" }}>
                 {active && (
-                  <circle cx={marker.x} cy={marker.y} r={r + 12} fill={c} opacity="0.15" />
+                  <circle cx={city.x} cy={city.y} r={r + 12} fill={c} opacity="0.15" />
                 )}
-                <circle cx={marker.x} cy={marker.y} r={r}
+                <circle cx={city.x} cy={city.y} r={r}
                         fill={active ? c : "transparent"}
                         stroke={c}
                         strokeWidth={active ? 3 : 2}
                         opacity={active ? 1 : 0.6} />
                 {(isHover || cg.status === "you") && (
-                  <text x={marker.x} y={marker.y - 28} textAnchor="middle" fontSize="22" fontFamily="JetBrains Mono" fill={c} fontWeight="700">{marker.team}</text>
+                  <text x={city.x} y={city.y - 28} textAnchor="middle" fontSize="22" fontFamily="JetBrains Mono" fill={c} fontWeight="700">{city.team}</text>
                 )}
               </g>
             );
@@ -197,13 +192,12 @@ function StadiumMap({ onSelectPlayer }) {
 }
 
 function YourGamesStrip({ cityGameData, onSelectPlayer }) {
-  const { PLAYERS, ROSTER_IDS, mapSiteForTeam, WEEK11_HOME_AT_SHARED } = window;
-  // For each roster player, resolve shared-venue home coords (MetLife, LAC/LAR)
+  const { PLAYERS, ROSTER_IDS } = window;
+  // For each roster player, get their game context
   const games = ROSTER_IDS.map(id => {
     const p = PLAYERS.find(x => x.id === id);
     if (!p) return null;
-    const site = mapSiteForTeam(p.team, WEEK11_HOME_AT_SHARED);
-    const cg = cityGameData[site.displayTeam];
+    const cg = cityGameData[p.team];
     return { player: p, ctx: cg };
   }).filter(Boolean);
 

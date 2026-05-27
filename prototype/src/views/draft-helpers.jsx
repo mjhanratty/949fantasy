@@ -476,17 +476,15 @@ function gradeUserDraft(roster, rosterSlots = buildRosterSlots(DEFAULT_ROSTER_CO
     const starterGrade = gradeLineupDraft(starters);
     return { ...starterGrade, core: roster.reduce((s, p) => s + p.adjusted, 0), buckets: countDraftBuckets(roster) };
   }
-  const avgDraftScore = roster.reduce((s, p) => s + (p.draft?.draftScore || draftStockGrade(p).score || 60), 0) / roster.length;
+  const draftScore = bucketAdjustedDraftScore(roster);
   const counts = countPositions(roster);
   const balance = Math.min(counts.RB || 0, 2) + Math.min(counts.WR || 0, 2) + Math.min(counts.QB || 0, 1) + Math.min(counts.TE || 0, 1);
-  const score = avgDraftScore + balance * 1.2;
+  const score = draftScore.score + balance * 0.8;
   const core = roster.reduce((s, p) => s + p.adjusted, 0);
-  const buckets = countDraftBuckets(roster);
+  const buckets = draftScore.buckets;
   const note = `${buckets.steals} steals · ${buckets.expected} expected · ${buckets.reaches} reaches`;
-  if (score >= 91) return { letter: "A", color: "var(--mint)",      note, core, score, buckets };
-  if (score >= 80) return { letter: "B", color: "var(--mint-soft)", note, core, score, buckets };
-  if (score >= 68) return { letter: "C", color: "var(--gold)",      note, core, score, buckets };
-  return { letter: "D", color: "var(--red)", note, core, score, buckets };
+  const letter = draftScoreLetter(score);
+  return { letter, color: gradeColor(letter), note, core, score, rawScore: draftScore.rawScore, buckets };
 }
 
 function countDraftBuckets(roster) {
@@ -517,15 +515,30 @@ function buildScoredLineup(roster, rosterSlots = buildRosterSlots(DEFAULT_ROSTER
   return lineup;
 }
 
+function bucketAdjustedDraftScore(players) {
+  if (!players.length) return { score: 0, rawScore: 0, buckets: { steals: 0, expected: 0, reaches: 0 } };
+  const rawScore = players.reduce((sum, p) => sum + (p.draft?.draftScore || draftStockGrade(p).score || 60), 0) / players.length;
+  const buckets = countDraftBuckets(players);
+  const score = Math.max(30, Math.min(100,
+    rawScore + buckets.steals * 2.2 + buckets.expected * 0.3 - buckets.reaches * 6.5
+  ));
+  return { score, rawScore, buckets };
+}
+
+function draftScoreLetter(score) {
+  if (score >= 91) return "A";
+  if (score >= 80) return "B";
+  if (score >= 68) return "C";
+  return "D";
+}
+
 function gradeLineupDraft(starters) {
   if (!starters.length) return { letter: "—", color: "var(--slate)", note: "No starters drafted", score: 0 };
-  const avg = starters.reduce((sum, p) => sum + (p.draft?.draftScore || draftStockGrade(p).score || 60), 0) / starters.length;
-  const buckets = countDraftBuckets(starters);
+  const draftScore = bucketAdjustedDraftScore(starters);
+  const buckets = draftScore.buckets;
   const note = `${buckets.steals} starter steals · ${buckets.expected} expected · ${buckets.reaches} reaches`;
-  if (avg >= 91) return { letter: "A", color: "var(--mint)",      note, score: avg, buckets };
-  if (avg >= 80) return { letter: "B", color: "var(--mint-soft)", note, score: avg, buckets };
-  if (avg >= 68) return { letter: "C", color: "var(--gold)",      note, score: avg, buckets };
-  return { letter: "D", color: "var(--red)", note, score: avg, buckets };
+  const letter = draftScoreLetter(draftScore.score);
+  return { letter, color: gradeColor(letter), note, score: draftScore.score, rawScore: draftScore.rawScore, buckets };
 }
 
 function bestPositionScore(roster, pos) {
